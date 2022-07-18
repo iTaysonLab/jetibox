@@ -1,0 +1,12 @@
+<resources>
+    <string name="app_name">Jetibox</string>
+
+    <string name="auth_welcome">Welcome to Jetibox!</string>
+    <string name="auth_welcome_text">An experimental Xbox Live client.</string>
+    <string name="auth_sign">Sign in</string>
+    <string name="auth_disclaimer">View disclaimers</string>
+
+    <string name="tab_home">Home</string>
+    <string name="tab_library">Library</string>
+    <string name="tab_profile">Profile</string>
+</resources>

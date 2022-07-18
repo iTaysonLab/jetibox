@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="utf-8"?>
+<network-security-config>
+    <debug-overrides>
+        <trust-anchors>
+            <certificates src="system" />
+            <certificates src="user" />
+        </trust-anchors>
+    </debug-overrides>
+    <domain-config cleartextTrafficPermitted="true">
+        <domain includeSubdomains="true">192.168.137.1</domain>
+        <domain includeSubdomains="false">images-eds.xboxlive.com</domain>
+        <domain includeSubdomains="false">store-images.microsoft.com</domain>
+        <domain includeSubdomains="false">store-images.s-microsoft.com</domain>
+        <domain includeSubdomains="false">image.xboxlive.com</domain>
+        <domain includeSubdomains="false">universalstore.streaming.mediaservices.windows.net</domain>
+        <domain includeSubdomains="false">az15297.vo.msecnd.net</domain>
+    </domain-config>
+</network-security-config>
