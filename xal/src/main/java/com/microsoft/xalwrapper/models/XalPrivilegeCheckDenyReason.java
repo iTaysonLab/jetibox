@@ -13,7 +13,6 @@ public enum XalPrivilegeCheckDenyReason {
     private final int value;
 
     static {
-        XalPrivilegeCheckDenyReason[] values;
         for (XalPrivilegeCheckDenyReason xalPrivilegeCheckDenyReason : values()) {
             map.put(xalPrivilegeCheckDenyReason.value, xalPrivilegeCheckDenyReason);
         }

@@ -4,11 +4,9 @@ import android.util.Base64;
 import java.math.BigInteger;
 import java.security.interfaces.ECPublicKey;
 
-/* loaded from: classes2.dex */
 public class EccPubKey {
     private final ECPublicKey publicKey;
 
-    /* JADX INFO: Access modifiers changed from: package-private */
     public EccPubKey(ECPublicKey eCPublicKey) {
         this.publicKey = eCPublicKey;
     }

@@ -10,7 +10,6 @@ public class HttpClientResponse {
     private final long callHandle;
     private final Response response;
 
-    /* loaded from: classes2.dex */
     private final class NativeOutputStream extends OutputStream {
         private final long callHandle;
 
@@ -20,12 +19,12 @@ public class HttpClientResponse {
 
         private native void nativeWrite(long j2, byte[] bArr, int i2, int i3);
 
-        @Override // java.io.OutputStream
+        @Override
         public void write(byte[] bArr) {
             write(bArr, 0, bArr.length);
         }
 
-        @Override // java.io.OutputStream
+        @Override
         public void write(byte[] bArr, int i2, int i3) {
             Objects.requireNonNull(bArr);
             if (i2 >= 0 && i3 >= 0 && i2 + i3 <= bArr.length) {
@@ -35,7 +34,7 @@ public class HttpClientResponse {
             throw new IndexOutOfBoundsException();
         }
 
-        @Override // java.io.OutputStream
+        @Override
         public void write(int i2) {
             write(new byte[]{(byte) i2});
         }

@@ -3,7 +3,6 @@ package com.microsoft.xal.crypto;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 
-/* loaded from: classes2.dex */
 public class ShaHasher {
     private final MessageDigest md = getInstance("SHA-256");
 

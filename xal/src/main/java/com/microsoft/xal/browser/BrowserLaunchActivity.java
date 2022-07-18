@@ -10,7 +10,6 @@ import androidx.browser.customtabs.CustomTabsIntent;
 
 import com.microsoft.xal.logging.XalLogger;
 
-/* loaded from: classes2.dex */
 public class BrowserLaunchActivity extends Activity {
     private static final String BROWSER_INFO_STATE_KEY = "BROWSER_INFO_STATE";
     private static final String CUSTOM_TABS_IN_PROGRESS_STATE_KEY = "CUSTOM_TABS_IN_PROGRESS_STATE";
@@ -32,51 +31,6 @@ public class BrowserLaunchActivity extends Activity {
     private boolean m_sharedBrowserUsed = false;
     private String m_browserInfo = null;
 
-    /* JADX INFO: Access modifiers changed from: package-private */
-    /* renamed from: com.microsoft.xal.browser.BrowserLaunchActivity$1  reason: invalid class name */
-    /* loaded from: classes2.dex */
-    public static /* synthetic */ class AnonymousClass1 {
-        static final /* synthetic */ int[] $SwitchMap$com$microsoft$xal$browser$BrowserLaunchActivity$ShowUrlType;
-        static final /* synthetic */ int[] $SwitchMap$com$microsoft$xal$browser$BrowserLaunchActivity$WebResult;
-
-        static {
-            int[] iArr = new int[WebResult.values().length];
-            $SwitchMap$com$microsoft$xal$browser$BrowserLaunchActivity$WebResult = iArr;
-            try {
-                iArr[WebResult.SUCCESS.ordinal()] = 1;
-            } catch (NoSuchFieldError unused) {
-            }
-            try {
-                $SwitchMap$com$microsoft$xal$browser$BrowserLaunchActivity$WebResult[WebResult.CANCEL.ordinal()] = 2;
-            } catch (NoSuchFieldError unused2) {
-            }
-            try {
-                $SwitchMap$com$microsoft$xal$browser$BrowserLaunchActivity$WebResult[WebResult.FAIL.ordinal()] = 3;
-            } catch (NoSuchFieldError unused3) {
-            }
-            int[] iArr2 = new int[ShowUrlType.values().length];
-            $SwitchMap$com$microsoft$xal$browser$BrowserLaunchActivity$ShowUrlType = iArr2;
-            try {
-                iArr2[ShowUrlType.Normal.ordinal()] = 1;
-            } catch (NoSuchFieldError unused4) {
-            }
-            try {
-                $SwitchMap$com$microsoft$xal$browser$BrowserLaunchActivity$ShowUrlType[ShowUrlType.CookieRemoval_DEPRECATED.ordinal()] = 2;
-            } catch (NoSuchFieldError unused5) {
-            }
-            try {
-                $SwitchMap$com$microsoft$xal$browser$BrowserLaunchActivity$ShowUrlType[ShowUrlType.CookieRemovalSkipIfSharedCredentials.ordinal()] = 3;
-            } catch (NoSuchFieldError unused6) {
-            }
-            try {
-                $SwitchMap$com$microsoft$xal$browser$BrowserLaunchActivity$ShowUrlType[ShowUrlType.NonAuthFlow.ordinal()] = 4;
-            } catch (NoSuchFieldError unused7) {
-            }
-        }
-    }
-
-    /* JADX INFO: Access modifiers changed from: private */
-    /* loaded from: classes2.dex */
     public static class BrowserLaunchParameters {
         public final String EndUrl;
         public final String[] RequestHeaderKeys;
@@ -120,11 +74,11 @@ public class BrowserLaunchActivity extends Activity {
         }
 
         public static BrowserLaunchParameters FromArgs(Bundle bundle) {
-            String string = bundle.getString("START_URL");
-            String string2 = bundle.getString("END_URL");
-            String[] stringArray = bundle.getStringArray("REQUEST_HEADER_KEYS");
-            String[] stringArray2 = bundle.getStringArray("REQUEST_HEADER_VALUES");
-            ShowUrlType showUrlType = (ShowUrlType) bundle.get("SHOW_TYPE");
+            String string = bundle.getString(START_URL);
+            String string2 = bundle.getString(END_URL);
+            String[] stringArray = bundle.getStringArray(REQUEST_HEADER_KEYS);
+            String[] stringArray2 = bundle.getStringArray(REQUEST_HEADER_VALUES);
+            ShowUrlType showUrlType = (ShowUrlType) bundle.get(SHOW_TYPE);
             boolean z = bundle.getBoolean(BrowserLaunchActivity.IN_PROC_BROWSER);
             if (string == null || string2 == null || stringArray == null || stringArray2 == null || stringArray.length != stringArray2.length) {
                 return null;
@@ -144,26 +98,22 @@ public class BrowserLaunchActivity extends Activity {
             XalLogger xalLogger = new XalLogger("BrowserLaunchActivity.ShowUrlType");
             try {
                 if (i2 == 0) {
-                    ShowUrlType showUrlType = Normal;
                     xalLogger.close();
-                    return showUrlType;
+                    return Normal;
                 } else if (i2 == 1) {
                     xalLogger.Warning("Encountered unexpected show type, mapped to deprecated case CookieRemoval_DEPRECATED.");
-                    ShowUrlType showUrlType2 = CookieRemoval_DEPRECATED;
                     xalLogger.close();
-                    return showUrlType2;
+                    return CookieRemoval_DEPRECATED;
                 } else if (i2 == 2) {
-                    ShowUrlType showUrlType3 = CookieRemovalSkipIfSharedCredentials;
                     xalLogger.close();
-                    return showUrlType3;
+                    return CookieRemovalSkipIfSharedCredentials;
                 } else if (i2 != 3) {
                     xalLogger.Warning("Encountered unexpected show type int value: " + i2);
                     xalLogger.close();
                     return null;
                 } else {
-                    ShowUrlType showUrlType4 = NonAuthFlow;
                     xalLogger.close();
-                    return showUrlType4;
+                    return NonAuthFlow;
                 }
             } catch (Throwable th) {
                 try {
@@ -178,16 +128,8 @@ public class BrowserLaunchActivity extends Activity {
                 }
             }
         }
-
-        @Override // java.lang.Enum
-        public String toString() {
-            int i2 = AnonymousClass1.$SwitchMap$com$microsoft$xal$browser$BrowserLaunchActivity$ShowUrlType[ordinal()];
-            return i2 != 1 ? i2 != 2 ? i2 != 3 ? i2 != 4 ? "Unknown" : "NonAuthFlow" : "CookieRemovalSkipIfSharedCredentials" : "CookieRemoval_DEPRECATED" : "Normal";
-        }
     }
 
-    /* JADX INFO: Access modifiers changed from: private */
-    /* loaded from: classes2.dex */
     public enum WebResult {
         SUCCESS,
         FAIL,
@@ -216,13 +158,12 @@ public class BrowserLaunchActivity extends Activity {
             return;
         }
         this.m_logger.Flush();
-        int i2 = AnonymousClass1.$SwitchMap$com$microsoft$xal$browser$BrowserLaunchActivity$WebResult[webResult.ordinal()];
-        if (i2 == 1) {
+
+        if (webResult == WebResult.SUCCESS) {
             urlOperationSucceeded(j2, str, this.m_sharedBrowserUsed, this.m_browserInfo);
-        } else if (i2 == 2) {
+        } else if (webResult == WebResult.CANCEL) {
             urlOperationCanceled(j2, this.m_sharedBrowserUsed, this.m_browserInfo);
-        } else if (i2 != 3) {
-        } else {
+        } else if (webResult == WebResult.FAIL) {
             urlOperationFailed(j2, this.m_sharedBrowserUsed, this.m_browserInfo);
         }
     }
@@ -247,11 +188,11 @@ public class BrowserLaunchActivity extends Activity {
                     Intent intent = new Intent(context, BrowserLaunchActivity.class);
                     Bundle bundle = new Bundle();
                     bundle.putLong(OPERATION_ID, j2);
-                    bundle.putString("START_URL", str);
-                    bundle.putString("END_URL", str2);
-                    bundle.putSerializable("SHOW_TYPE", fromInt);
-                    bundle.putStringArray("REQUEST_HEADER_KEYS", strArr);
-                    bundle.putStringArray("REQUEST_HEADER_VALUES", strArr2);
+                    bundle.putString(START_URL, str);
+                    bundle.putString(END_URL, str2);
+                    bundle.putSerializable(SHOW_TYPE, fromInt);
+                    bundle.putStringArray(REQUEST_HEADER_KEYS, strArr);
+                    bundle.putStringArray(REQUEST_HEADER_VALUES, strArr2);
                     bundle.putBoolean(IN_PROC_BROWSER, z);
                     intent.putExtras(bundle);
                     intent.setFlags(268435456);
@@ -280,10 +221,8 @@ public class BrowserLaunchActivity extends Activity {
     private void startAuthSession(BrowserLaunchParameters browserLaunchParameters) {
         BrowserSelectionResult selectBrowser = BrowserSelector.selectBrowser(getApplicationContext(), browserLaunchParameters.UseInProcBrowser);
         this.m_browserInfo = selectBrowser.toString();
-        XalLogger xalLogger = this.m_logger;
-        xalLogger.Important("startAuthSession() Set browser info: " + this.m_browserInfo);
-        XalLogger xalLogger2 = this.m_logger;
-        xalLogger2.Important("startAuthSession() Starting auth session for ShowUrlType: " + browserLaunchParameters.ShowType.toString());
+        this.m_logger.Important("startAuthSession() Set browser info: " + this.m_browserInfo);
+        this.m_logger.Important("startAuthSession() Starting auth session for ShowUrlType: " + browserLaunchParameters.ShowType.toString());
         String packageName = selectBrowser.packageName();
         if (packageName == null) {
             this.m_logger.Important("startAuthSession() BrowserSelector returned null package name. Choosing WebKit strategy.");
@@ -313,11 +252,11 @@ public class BrowserLaunchActivity extends Activity {
         this.m_sharedBrowserUsed = false;
         Intent intent = new Intent(getApplicationContext(), WebKitWebViewController.class);
         Bundle bundle = new Bundle();
-        bundle.putString("START_URL", str);
-        bundle.putString("END_URL", str2);
-        bundle.putSerializable("SHOW_TYPE", showUrlType);
-        bundle.putStringArray("REQUEST_HEADER_KEYS", strArr);
-        bundle.putStringArray("REQUEST_HEADER_VALUES", strArr2);
+        bundle.putString(START_URL, str);
+        bundle.putString(END_URL, str2);
+        bundle.putSerializable(SHOW_TYPE, showUrlType);
+        bundle.putStringArray(REQUEST_HEADER_KEYS, strArr);
+        bundle.putStringArray(REQUEST_HEADER_VALUES, strArr2);
         intent.putExtras(bundle);
         startActivityForResult(intent, WEB_KIT_WEB_VIEW_REQUEST);
     }
@@ -344,8 +283,7 @@ public class BrowserLaunchActivity extends Activity {
                 finishOperation(WebResult.CANCEL, null);
                 return;
             } else if (i3 != 8054) {
-                XalLogger xalLogger = this.m_logger;
-                xalLogger.Warning("onActivityResult() Unrecognized result code received from web view:" + i3);
+                this.m_logger.Warning("onActivityResult() Unrecognized result code received from web view:" + i3);
             }
             finishOperation(WebResult.FAIL, null);
             return;

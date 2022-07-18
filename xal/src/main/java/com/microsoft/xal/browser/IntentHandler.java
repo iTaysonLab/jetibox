@@ -5,7 +5,6 @@ import android.content.Intent;
 import android.os.Bundle;
 import com.microsoft.xal.logging.XalLogger;
 
-/* loaded from: classes2.dex */
 public class IntentHandler extends Activity {
     private final XalLogger m_logger = new XalLogger("IntentHandler");
 

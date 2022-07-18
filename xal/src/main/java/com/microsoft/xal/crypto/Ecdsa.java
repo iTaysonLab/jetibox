@@ -24,7 +24,6 @@ import java.security.spec.InvalidKeySpecException;
 import java.security.spec.PKCS8EncodedKeySpec;
 import java.security.spec.X509EncodedKeySpec;
 
-/* loaded from: classes2.dex */
 public class Ecdsa {
     private static final String ANDROID_KEY_STORE = "AndroidKeyStore";
     private static final String ECDSA_SIGNATURE_NAME = "NONEwithECDSA";

@@ -12,17 +12,14 @@ import okhttp3.Request;
 import okhttp3.RequestBody;
 import okhttp3.Response;
 
-/* loaded from: classes2.dex */
 public class HttpClientRequestGS {
     private static final byte[] NO_BODY = new byte[0];
-    private static OkHttpClient OK_CLIENT = new OkHttpClient.Builder().retryOnConnectionFailure(false).build();
+    private static final OkHttpClient OK_CLIENT = new OkHttpClient.Builder().retryOnConnectionFailure(false).build();
     private Request okHttpRequest;
     private Request.Builder requestBuilder = new Request.Builder();
 
-    /* JADX INFO: Access modifiers changed from: private */
     public native void OnRequestCompleted(long j2, HttpClientResponseGS httpClientResponseGS);
 
-    /* JADX INFO: Access modifiers changed from: private */
     public native void OnRequestFailed(long j2, String str);
 
     public static HttpClientRequestGS createClientRequest() {
@@ -30,18 +27,18 @@ public class HttpClientRequestGS {
     }
 
     public static boolean isNetworkAvailable(Context context) {
-        NetworkInfo activeNetworkInfo = ((ConnectivityManager) context.getSystemService("connectivity")).getActiveNetworkInfo();
+        NetworkInfo activeNetworkInfo = ((ConnectivityManager) context.getSystemService(Context.CONNECTIVITY_SERVICE)).getActiveNetworkInfo();
         return activeNetworkInfo != null && activeNetworkInfo.isConnected();
     }
 
     public void doRequestAsync(final long j2) {
-        OK_CLIENT.newCall(this.requestBuilder.build()).enqueue(new Callback() { // from class: com.xbox.httpclient.HttpClientRequestGS.1
-            @Override // okhttp3.Callback
+        OK_CLIENT.newCall(this.requestBuilder.build()).enqueue(new Callback() {
+            @Override
             public void onFailure(Call call, IOException iOException) {
                 HttpClientRequestGS.this.OnRequestFailed(j2, iOException.getClass().getCanonicalName());
             }
 
-            @Override // okhttp3.Callback
+            @Override
             public void onResponse(Call call, Response response) {
                 HttpClientRequestGS.this.OnRequestCompleted(j2, new HttpClientResponseGS(response));
             }

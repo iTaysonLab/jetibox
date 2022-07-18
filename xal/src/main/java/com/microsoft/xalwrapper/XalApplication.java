@@ -131,14 +131,14 @@ public class XalApplication {
         this.m_addUserOperation.setLoadingState();
         DebugLogger.Log(TAG, "Calling XalAddUserWithUi");
         AddFirstUserWithUi(new XalSignInCallback() {
-            @Override // com.microsoft.xalwrapper.XalApplication.XalSignInCallback
+            @Override
             public void onError(int i2, String str) {
                 XalApplication.this.m_addUserOperation.setErrorState(i2, str);
                 DebugLogger.Log(XalApplication.TAG, "XalAddUserWithUi onError: " + XalApplication.this.m_addUserOperation.getErrorState().toString());
                 xalSignInCallback.onError(i2, str);
             }
 
-            @Override // com.microsoft.xalwrapper.XalApplication.XalSignInCallback
+            @Override
             public void onSuccess(long xuid, String gamertag, String uniqueModernGamertag, int ageGroup, String webAccountId) {
                 XalUser withContent = XalUser.withContent(xuid, ageGroup, gamertag, uniqueModernGamertag, webAccountId);
                 DebugLogger.Log(XalApplication.TAG, "XalAddUserWithUi onSuccess: " + withContent);
@@ -157,54 +157,6 @@ public class XalApplication {
 
     private boolean isSignedIn() {
         return this.m_addUserOperation.isContent();
-    }
-
-    /* JADX INFO: Access modifiers changed from: private */
-    /* renamed from: lambda$XalAddUserWithUi$2 */
-    public /* synthetic */ void a(XalSignInCallback xalSignInCallback) {
-        if (this.m_addUserOperation.isContent()) {
-            XalUser content = this.m_addUserOperation.getContent();
-            xalSignInCallback.onSuccess(content.xuid(), content.gamertag(), content.uniqueModernGamertag(), content.ageGroup(), content.webAccountId());
-        } else if (!this.m_addUserOperation.isError() || this.m_addUserOperation.getErrorState() == null) {
-        } else {
-            if (this.m_addUserOperation.getErrorState().errorCode() == E_XAL_UIREQUIRED) {
-                DebugLogger.Log(TAG, "XalAddUserWithUi got UIRequired due to a pending silent sign in, retrying UI operation");
-                XalAddUserWithUiInternal(xalSignInCallback);
-                return;
-            }
-            xalSignInCallback.onError(this.m_addUserOperation.getErrorState().errorCode(), this.m_addUserOperation.getErrorState().errorMessage());
-        }
-    }
-
-    /* JADX INFO: Access modifiers changed from: private */
-    /* renamed from: lambda$XalInitialize$0 */
-    public /* synthetic */ void b(XalInitializeCallback xalInitializeCallback) {
-        if (this.m_xalInitializeOperation.isContent() && this.m_xalInitializeOperation.getContent() != null) {
-            xalInitializeCallback.onSuccess(this.m_xalInitializeOperation.getContent().baseCorrelationVector());
-        } else if (!this.m_xalInitializeOperation.isError() || this.m_xalInitializeOperation.getErrorState() == null) {
-        } else {
-            xalInitializeCallback.onError(this.m_xalInitializeOperation.getErrorState().errorCode(), this.m_xalInitializeOperation.getErrorState().errorMessage());
-        }
-    }
-
-    /* JADX INFO: Access modifiers changed from: private */
-    /* renamed from: lambda$XalSignOutUser$3 */
-    public /* synthetic */ void c(XalSignOutCallback xalSignOutCallback, int i2, String str) {
-        this.m_addUserOperation.setNotRequestedState();
-        DebugLogger.Log(TAG, "XalSignOutUser complete");
-        xalSignOutCallback.onCompleted(i2, str);
-    }
-
-    /* JADX INFO: Access modifiers changed from: private */
-    /* renamed from: lambda$XalTryAddFirstUserSilently$1 */
-    public /* synthetic */ void d(XalSignInCallback xalSignInCallback) {
-        if (this.m_addUserOperation.isContent() && this.m_addUserOperation.getContent() != null) {
-            XalUser content = this.m_addUserOperation.getContent();
-            xalSignInCallback.onSuccess(content.xuid(), content.gamertag(), content.uniqueModernGamertag(), content.ageGroup(), content.webAccountId());
-        } else if (!this.m_addUserOperation.isError() || this.m_addUserOperation.getErrorState() == null) {
-        } else {
-            xalSignInCallback.onError(this.m_addUserOperation.getErrorState().errorCode(), this.m_addUserOperation.getErrorState().errorMessage());
-        }
     }
 
     public String GetLocalStoragePath() {
@@ -256,14 +208,24 @@ public class XalApplication {
 
     public synchronized void XalAddUserWithUi(final XalSignInCallback xalSignInCallback) {
         DebugLogger.Log(TAG, "XalAddUserWithUi");
+
         if (!this.m_addUserOperation.isNotRequested() && !this.m_addUserOperation.isError()) {
-            this.m_addUserOperation.registerListener(new Runnable() { // from class: com.microsoft.xalwrapper.c
-                @Override // java.lang.Runnable
-                public final void run() {
-                    XalApplication.this.a(xalSignInCallback);
+            this.m_addUserOperation.registerListener(() -> {
+                if (this.m_addUserOperation.isContent()) {
+                    XalUser content = this.m_addUserOperation.getContent();
+                    xalSignInCallback.onSuccess(content.xuid(), content.gamertag(), content.uniqueModernGamertag(), content.ageGroup(), content.webAccountId());
+                } else if (!this.m_addUserOperation.isError() || this.m_addUserOperation.getErrorState() == null) {
+                } else {
+                    if (this.m_addUserOperation.getErrorState().errorCode() == E_XAL_UIREQUIRED) {
+                        DebugLogger.Log(TAG, "XalAddUserWithUi got UIRequired due to a pending silent sign in, retrying UI operation");
+                        XalAddUserWithUiInternal(xalSignInCallback);
+                        return;
+                    }
+                    xalSignInCallback.onError(this.m_addUserOperation.getErrorState().errorCode(), this.m_addUserOperation.getErrorState().errorMessage());
                 }
             });
         }
+
         XalAddUserWithUiInternal(xalSignInCallback);
     }
 
@@ -301,16 +263,15 @@ public class XalApplication {
         if (this.m_xalInitializeOperation.isNotRequested()) {
             this.m_xalInitializeOperation.setLoadingState();
             DebugLogger.Log(str5, "Calling InitializeXal");
-            InitializeXal(z, z2, z3, z4, j2, str, str2, str3, i2, str4, new XalInitializeCallback() { // from class: com.microsoft.xalwrapper.XalApplication.1
-                @Override // com.microsoft.xalwrapper.XalApplication.XalInitializeCallback
+            InitializeXal(z, z2, z3, z4, j2, str, str2, str3, i2, str4, new XalInitializeCallback() {
+                @Override
                 public void onError(int i4, String str6) {
                     XalApplication.this.m_xalInitializeOperation.setErrorState(i4, str6);
-                    String str7 = XalApplication.TAG;
-                    DebugLogger.Log(str7, "InitializeXal onError: " + XalApplication.this.m_xalInitializeOperation.getErrorState().toString());
+                    DebugLogger.Log(XalApplication.TAG, "InitializeXal onError: " + XalApplication.this.m_xalInitializeOperation.getErrorState().toString());
                     xalInitializeCallback.onError(i4, str6);
                 }
 
-                @Override // com.microsoft.xalwrapper.XalApplication.XalInitializeCallback
+                @Override
                 public void onSuccess(String str6) {
                     DebugLogger.Log(XalApplication.TAG, "InitializeXal onSuccess");
                     XalApplication.this.m_xalInitializeOperation.setContentState(XalInitializeContent.with(str6));
@@ -318,18 +279,24 @@ public class XalApplication {
                 }
             });
         } else {
-            this.m_xalInitializeOperation.registerListener(() -> XalApplication.this.b(xalInitializeCallback));
+            this.m_xalInitializeOperation.registerListener(() -> {
+                if (this.m_xalInitializeOperation.isContent() && this.m_xalInitializeOperation.getContent() != null) {
+                    xalInitializeCallback.onSuccess(this.m_xalInitializeOperation.getContent().baseCorrelationVector());
+                } else if (!this.m_xalInitializeOperation.isError() || this.m_xalInitializeOperation.getErrorState() == null) {
+                } else {
+                    xalInitializeCallback.onError(this.m_xalInitializeOperation.getErrorState().errorCode(), this.m_xalInitializeOperation.getErrorState().errorMessage());
+                }
+            });
         }
     }
 
     public void XalSignOutUser(final XalSignOutCallback xalSignOutCallback) {
         DebugLogger.Log(TAG, "XalSignOutUser");
         if (isSignedIn()) {
-            SignOutUser(new XalSignOutCallback() { // from class: com.microsoft.xalwrapper.a
-                @Override // com.microsoft.xalwrapper.XalApplication.XalSignOutCallback
-                public final void onCompleted(int i2, String str) {
-                    XalApplication.this.c(xalSignOutCallback, i2, str);
-                }
+            SignOutUser((i2, str) -> {
+                this.m_addUserOperation.setNotRequestedState();
+                DebugLogger.Log(TAG, "XalSignOutUser complete");
+                xalSignOutCallback.onCompleted(i2, str);
             });
         } else {
             xalSignOutCallback.onCompleted(E_XAL_USERSIGNEDOUT, "Cannot sign out a user that is already signed out.");
@@ -337,27 +304,31 @@ public class XalApplication {
     }
 
     public synchronized void XalTryAddFirstUserSilently(final XalSignInCallback xalSignInCallback) {
-        String str = TAG;
-        DebugLogger.Log(str, "XalTryAddFirstUserSilently");
+        DebugLogger.Log(TAG, "XalTryAddFirstUserSilently");
+
         if (!this.m_addUserOperation.isNotRequested() && !this.m_addUserOperation.isError()) {
-            this.m_addUserOperation.registerListener(new Runnable() { // from class: com.microsoft.xalwrapper.b
-                @Override // java.lang.Runnable
-                public final void run() {
-                    XalApplication.this.d(xalSignInCallback);
+            this.m_addUserOperation.registerListener(() -> {
+                if (this.m_addUserOperation.isContent() && this.m_addUserOperation.getContent() != null) {
+                    XalUser content = this.m_addUserOperation.getContent();
+                    xalSignInCallback.onSuccess(content.xuid(), content.gamertag(), content.uniqueModernGamertag(), content.ageGroup(), content.webAccountId());
+                } else if (!this.m_addUserOperation.isError() || this.m_addUserOperation.getErrorState() == null) {
+                } else {
+                    xalSignInCallback.onError(this.m_addUserOperation.getErrorState().errorCode(), this.m_addUserOperation.getErrorState().errorMessage());
                 }
             });
         }
+
         this.m_addUserOperation.setLoadingState();
-        DebugLogger.Log(str, "Calling AddFirstUserSilent");
-        AddFirstUserSilent(new XalSignInCallback() { // from class: com.microsoft.xalwrapper.XalApplication.2
-            @Override // com.microsoft.xalwrapper.XalApplication.XalSignInCallback
+        DebugLogger.Log(TAG, "Calling AddFirstUserSilent");
+        AddFirstUserSilent(new XalSignInCallback() {
+            @Override
             public void onError(int i2, String str2) {
                 XalApplication.this.m_addUserOperation.setErrorState(i2, str2);
                 DebugLogger.Log(XalApplication.TAG, "XalTryAddFirstUserSilently onError: " + XalApplication.this.m_addUserOperation.getErrorState().toString());
                 xalSignInCallback.onError(i2, str2);
             }
 
-            @Override // com.microsoft.xalwrapper.XalApplication.XalSignInCallback
+            @Override
             public void onSuccess(long xuid, String str2, String str3, int ageGroup, String str4) {
                 XalUser withContent = XalUser.withContent(xuid, ageGroup, str2, str3, str4);
                 DebugLogger.Log(XalApplication.TAG, "XalTryAddFirstUserSilently onSuccess: " + withContent);

@@ -8,7 +8,6 @@ import android.webkit.CookieManager;
 import android.webkit.WebChromeClient;
 import android.webkit.WebView;
 import android.webkit.WebViewClient;
-import com.microsoft.xal.browser.BrowserLaunchActivity;
 import com.microsoft.xal.logging.XalLogger;
 import java.util.HashMap;
 

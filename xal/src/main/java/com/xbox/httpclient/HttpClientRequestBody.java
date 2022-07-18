@@ -10,7 +10,6 @@ import okhttp3.RequestBody;
 import okio.BufferedSink;
 import okio.Okio;
 
-/* loaded from: classes2.dex */
 public final class HttpClientRequestBody extends RequestBody {
     private final long callHandle;
     private final long contentLength;
@@ -22,12 +21,12 @@ public final class HttpClientRequestBody extends RequestBody {
         this.contentLength = j3;
     }
 
-    @Override // okhttp3.RequestBody
+    @Override
     public long contentLength() {
         return this.contentLength;
     }
 
-    @Override // okhttp3.RequestBody
+    @Override
     public MediaType contentType() {
         return this.contentType;
     }
@@ -37,8 +36,7 @@ public final class HttpClientRequestBody extends RequestBody {
         bufferedSink.writeAll(Okio.source(new NativeInputStream(this.callHandle)));
     }
 
-    /* loaded from: classes2.dex */
-    private final class NativeInputStream extends InputStream {
+    private static final class NativeInputStream extends InputStream {
         private final long callHandle;
         private long offset = 0;
 
@@ -48,25 +46,25 @@ public final class HttpClientRequestBody extends RequestBody {
 
         private native int nativeRead(long j2, long j3, byte[] bArr, long j4, long j5);
 
-        @Override // java.io.InputStream
+        @Override
         public int read() {
             byte[] bArr = new byte[1];
             read(bArr);
             return bArr[0];
         }
 
-        @Override // java.io.InputStream
+        @Override
         public long skip(long j2) {
             this.offset += j2;
             return j2;
         }
 
-        @Override // java.io.InputStream
+        @Override
         public int read(byte[] bArr) {
             return read(bArr, 0, bArr.length);
         }
 
-        @Override // java.io.InputStream
+        @Override
         public int read(byte[] bArr, int i2, int i3) {
             Objects.requireNonNull(bArr);
             if (i2 < 0 || i3 < 0 || i2 + i3 > bArr.length) {

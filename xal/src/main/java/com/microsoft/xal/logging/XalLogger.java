@@ -4,7 +4,6 @@ import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.GregorianCalendar;
 
-/* loaded from: classes2.dex */
 public class XalLogger implements AutoCloseable {
     private static final SimpleDateFormat LogDateFormat = new SimpleDateFormat("HH:mm:ss.SSS");
     private static final String TAG = "XALJAVA";
@@ -12,7 +11,6 @@ public class XalLogger implements AutoCloseable {
     private final ArrayList<LogEntry> m_logs = new ArrayList<>();
     private LogLevel m_leastVerboseLevel = LogLevel.Verbose;
 
-    /* loaded from: classes2.dex */
     public enum LogLevel {
         Error(1, 'E'),
         Warning(2, 'W'),
@@ -49,14 +47,14 @@ public class XalLogger implements AutoCloseable {
     private static native void nativeLogBatch(int i2, LogEntry[] logEntryArr);
 
     public void Error(String str) {
-        String.format("[%s] %s", this.m_subArea, str);
-        Log(LogLevel.Error, str);
+        Log(LogLevel.Error, String.format("[%s] %s", this.m_subArea, str));
     }
 
     public synchronized void Flush() {
         if (this.m_logs.isEmpty()) {
             return;
         }
+
         try {
             int ToInt = this.m_leastVerboseLevel.ToInt();
             ArrayList<LogEntry> arrayList = this.m_logs;
@@ -71,34 +69,29 @@ public class XalLogger implements AutoCloseable {
     }
 
     public void Important(String str) {
-        LogLevel logLevel = LogLevel.Important;
-        String.format("[%c][%s] %s", Character.valueOf(logLevel.ToChar()), this.m_subArea, str);
-        Log(logLevel, str);
+        Log(LogLevel.Important, String.format("[%c][%s] %s", LogLevel.Important.ToChar(), this.m_subArea, str));
     }
 
     public void Information(String str) {
-        String.format("[%s] %s", this.m_subArea, str);
-        Log(LogLevel.Information, str);
+        Log(LogLevel.Information, String.format("[%s] %s", this.m_subArea, str));
     }
 
     public synchronized void Log(LogLevel logLevel, String str) {
-        this.m_logs.add(new LogEntry(logLevel, String.format("[%c][%s][%s] %s", Character.valueOf(logLevel.ToChar()), Timestamp(), this.m_subArea, str)));
+        this.m_logs.add(new LogEntry(logLevel, String.format("[%c][%s][%s] %s", logLevel.ToChar(), Timestamp(), this.m_subArea, str)));
         if (this.m_leastVerboseLevel.ToInt() > logLevel.ToInt()) {
             this.m_leastVerboseLevel = logLevel;
         }
     }
 
     public void Verbose(String str) {
-        String.format("[%s] %s", this.m_subArea, str);
-        Log(LogLevel.Verbose, str);
+        Log(LogLevel.Verbose, String.format("[%s] %s", this.m_subArea, str));
     }
 
     public void Warning(String str) {
-        String.format("[%s] %s", this.m_subArea, str);
-        Log(LogLevel.Warning, str);
+        Log(LogLevel.Warning, String.format("[%s] %s", this.m_subArea, str));
     }
 
-    @Override // java.lang.AutoCloseable
+    @Override
     public void close() {
         Flush();
     }

@@ -3,10 +3,8 @@ package com.xbox.httpclient;
 import java.io.IOException;
 import okhttp3.Response;
 
-/* JADX INFO: Access modifiers changed from: package-private */
-/* loaded from: classes2.dex */
 public class HttpClientResponseGS {
-    private Response response;
+    private final Response response;
 
     public HttpClientResponseGS(Response response) {
         this.response = response;
