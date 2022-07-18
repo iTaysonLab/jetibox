@@ -72,6 +72,7 @@ fun LandingScreen(
             verticalArrangement = Arrangement.spacedBy(8.dp),
             modifier = Modifier
                 .align(Alignment.BottomCenter)
+                .padding(bottom = 8.dp)
                 .fillMaxWidth()
         ) {
             Button(onClick = { viewModel.launchLogin(

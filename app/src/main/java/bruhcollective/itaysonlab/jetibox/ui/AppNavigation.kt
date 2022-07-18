@@ -39,7 +39,14 @@ fun AppNavigation(
     val signedIn = if (!xalBridge.initialized) {
       xblUserController.tryRestoring()
       xalBridge.initialize()
-      (xalBridge.tryUsingSavedData() is XalBridge.XalBridgeSemaphore.Success).also { xblUserController.reload() }
+
+      val signInTry = xalBridge.tryUsingSavedData() is XalBridge.XalBridgeSemaphore.Success
+
+      if (signInTry) {
+        xblUserController.reload()
+      }
+
+      signInTry
     } else {
       xalBridge.currentProfile != null
     }
