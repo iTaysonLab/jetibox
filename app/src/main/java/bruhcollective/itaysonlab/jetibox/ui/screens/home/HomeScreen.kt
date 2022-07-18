@@ -17,9 +17,9 @@ import androidx.lifecycle.viewModelScope
 import bruhcollective.itaysonlab.jetibox.core.models.contentbuilder.*
 import bruhcollective.itaysonlab.jetibox.core.service.ContentBuilderService
 import bruhcollective.itaysonlab.jetibox.core.service.TitleHubService
+import bruhcollective.itaysonlab.jetibox.core.stream.extractTitlesFromCBLayout
 import bruhcollective.itaysonlab.jetibox.core.xal_bridge.XalBridge
 import bruhcollective.itaysonlab.jetibox.ui.LambdaNavigationController
-import bruhcollective.itaysonlab.jetibox.ui.ext.compositeSurfaceElevation
 import bruhcollective.itaysonlab.jetibox.ui.screens.home.render.HomeLayoutRender
 import bruhcollective.itaysonlab.jetibox.ui.screens.home.render.LayoutStorage
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -42,7 +42,7 @@ fun HomeScreen(
                     title = {},
                     colors = TopAppBarDefaults.smallTopAppBarColors(
                         containerColor = Color.Transparent,
-                        scrolledContainerColor = MaterialTheme.colorScheme.compositeSurfaceElevation(
+                        scrolledContainerColor = MaterialTheme.colorScheme.surfaceColorAtElevation(
                             3.dp
                         )
                     ),
@@ -99,12 +99,7 @@ class HomeScreenViewModel @Inject constructor(
                 // TODO migrate to metadata system (probably MMKV-based like Jetispot)
                 storage.fillTitles(
                     thService = thService,
-                    list = it.layout
-                        .mapNotNull { item -> item.channelData }
-                        .flatMap { data -> data.items }
-                        .flatMap { items -> items.itemLayers }
-                        .filterIsInstance<ContentBuilderLayer.GameTitle>()
-                        .flatMap { titles -> titles.data.titles }
+                    list = it.layout.extractTitlesFromCBLayout()
                 )
             }
         }

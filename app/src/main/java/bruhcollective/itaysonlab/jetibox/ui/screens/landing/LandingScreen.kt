@@ -16,7 +16,6 @@ import bruhcollective.itaysonlab.jetibox.ui.LambdaNavigationController
 import bruhcollective.itaysonlab.jetibox.R
 import bruhcollective.itaysonlab.jetibox.core.xal_bridge.XalBridge
 import bruhcollective.itaysonlab.jetibox.core.xbl_bridge.XblUserController
-import bruhcollective.itaysonlab.jetibox.ui.ext.compositeSurfaceElevation
 import bruhcollective.itaysonlab.jetibox.ui.screens.Screen
 import com.microsoft.xalwrapper.models.XalUser
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -96,7 +95,7 @@ fun LandingScreen(
             modifier = Modifier.align(Alignment.BottomStart),
             snackbar = { data ->
                 Snackbar(
-                    containerColor = MaterialTheme.colorScheme.compositeSurfaceElevation(12.dp),
+                    containerColor = MaterialTheme.colorScheme.surfaceColorAtElevation(12.dp),
                     contentColor = MaterialTheme.colorScheme.onSurface,
                     snackbarData = data
                 )

@@ -7,7 +7,6 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material3.*
-import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -20,7 +19,6 @@ import bruhcollective.itaysonlab.jetibox.core.xal_bridge.XalBridge
 import bruhcollective.itaysonlab.jetibox.core.xbl_bridge.XblUserController
 import bruhcollective.itaysonlab.jetibox.ui.AppNavigation
 import bruhcollective.itaysonlab.jetibox.ui.LambdaNavigationController
-import bruhcollective.itaysonlab.jetibox.ui.ext.compositeSurfaceElevation
 import bruhcollective.itaysonlab.jetibox.ui.screens.Screen
 import bruhcollective.itaysonlab.jetibox.ui.theme.ApplicationThemeSource
 import bruhcollective.itaysonlab.jetibox.ui.theme.JetiboxTheme
@@ -65,7 +63,7 @@ class MainActivity : ComponentActivity() {
                         if (Screen.hideNavigationBar.any { it == currentDestination?.route }) return@Scaffold
                         bruhcollective.itaysonlab.jetibox.ui.shared.evo.NavigationBar(
                             modifier = Modifier
-                                .background(MaterialTheme.colorScheme.compositeSurfaceElevation(3.dp)),
+                                .background(MaterialTheme.colorScheme.surfaceColorAtElevation(3.dp)),
                             contentPadding = PaddingValues(bottom = navBarHeightDp)
                         ) {
                             Screen.showInBottomNavigation.forEach { (screen, icon) ->

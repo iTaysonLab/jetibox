@@ -16,10 +16,12 @@ import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.painter.ColorPainter
 import androidx.compose.ui.input.nestedscroll.nestedScroll
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalDensity
+import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
@@ -27,7 +29,6 @@ import androidx.lifecycle.ViewModel
 import bruhcollective.itaysonlab.jetibox.core.models.titlehub.*
 import bruhcollective.itaysonlab.jetibox.core.service.TitleHubService
 import bruhcollective.itaysonlab.jetibox.ui.LambdaNavigationController
-import bruhcollective.itaysonlab.jetibox.ui.ext.compositeSurfaceElevation
 import bruhcollective.itaysonlab.jetibox.ui.shared.evo.SmallTopAppBar
 import coil.compose.AsyncImage
 import com.google.accompanist.flowlayout.FlowRow
@@ -58,13 +59,16 @@ fun TitleStoreScreen(
                 topBar = {
                     SmallTopAppBar(
                         title = {
-                            Text(
+                            TitleHeaderSmall(
+                                data.app.displayImage,
                                 data.app.name,
-                                modifier = Modifier.alpha(scrollBehavior.scrollFraction)
+                                data.app.detail?.developerName.orEmpty(),
+                                data.app.detail?.publisherName.orEmpty(),
+                                Modifier.fillMaxSize().alpha(scrollBehavior.scrollFraction)
                             )
                         },
                         navigationIcon = {
-                            IconButton(onClick = { /*TODO*/ }) {
+                            IconButton(onClick = { navController.popBackStack() }) {
                                 Icon(Icons.Default.ArrowBack, contentDescription = null)
                             }
                         },
@@ -72,7 +76,7 @@ fun TitleStoreScreen(
                             containerColor = Color.Transparent,
                             navigationIconContentColor = Color.White,
                             actionIconContentColor = Color.White,
-                            scrolledContainerColor = MaterialTheme.colorScheme.compositeSurfaceElevation(
+                            scrolledContainerColor = MaterialTheme.colorScheme.surfaceColorAtElevation(
                                 3.dp
                             )
                         ),
@@ -111,10 +115,18 @@ fun TitleStoreScreen(
                         Column(
                             Modifier
                                 .padding(horizontal = 16.dp)
-                                .padding(bottom = 16.dp)) {
-                            Text(text = "Description", fontSize = 19.sp, color = MaterialTheme.colorScheme.onSurface)
+                                .padding(bottom = 16.dp)
+                        ) {
+                            Text(
+                                text = "Description",
+                                fontSize = 19.sp,
+                                color = MaterialTheme.colorScheme.onSurface
+                            )
                             Spacer(modifier = Modifier.height(4.dp))
-                            Text(text = data.app.detail?.description.orEmpty(), color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.7f))
+                            Text(
+                                text = data.app.detail?.description.orEmpty(),
+                                color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.7f)
+                            )
                         }
                     }
 
@@ -125,7 +137,10 @@ fun TitleStoreScreen(
                     }
 
                     item {
-                        TitleDevicesCard(data.app.devices, data.app.hardware?.maxDownloadSizeInBytes ?: 0L)
+                        TitleDevicesCard(
+                            data.app.devices,
+                            data.app.hardware?.maxDownloadSizeInBytes ?: 0L
+                        )
                     }
 
                     item {
@@ -231,7 +246,7 @@ private fun TitleHeader(
                 .padding(16.dp)
                 .padding(bottom = 12.dp)
         ) {
-            Text(titleName, color = Color.White, fontSize = 28.sp)
+            Text(titleName, color = Color.White, fontSize = 28.sp, lineHeight = 28.sp)
 
             if (developer == publisher) {
                 Text(joinedDevs, color = Color.White.copy(alpha = 0.7f))
@@ -242,10 +257,12 @@ private fun TitleHeader(
 
             Spacer(modifier = Modifier.height(6.dp))
 
-            Button(onClick = { /*TODO*/ }, colors = ButtonDefaults.buttonColors(
-                containerColor = Color.White.copy(alpha = 0.2f),
-                contentColor = Color.White
-            )) {
+            Button(
+                onClick = { /*TODO*/ }, colors = ButtonDefaults.buttonColors(
+                    containerColor = Color.White.copy(alpha = 0.2f),
+                    contentColor = Color.White
+                )
+            ) {
                 Text("Download")
             }
         }
@@ -274,10 +291,19 @@ private fun TitleMedia(
             .offset(y = (-16).dp)
             .fillMaxWidth()
             .clip(RoundedCornerShape(topStart = 12.dp, topEnd = 12.dp))
-            .height(200.dp)) {
+            .height(200.dp)
+    ) {
 
         HorizontalPager(count = screenshots.size, state = pagerState) { page ->
-            AsyncImage(model = screenshots[page], contentDescription = null, modifier = Modifier.fillMaxSize(), contentScale = ContentScale.Crop)
+            AsyncImage(
+                model = screenshots[page],
+                placeholder = ColorPainter(
+                    MaterialTheme.colorScheme.surfaceColorAtElevation(4.dp)
+                ),
+                contentDescription = null,
+                modifier = Modifier.fillMaxSize(),
+                contentScale = ContentScale.Crop
+            )
         }
 
         HorizontalPagerIndicator(
@@ -297,7 +323,7 @@ private fun TitleAchievementCard(
 ) {
     Column(
         Modifier
-            .background(MaterialTheme.colorScheme.compositeSurfaceElevation(4.dp))
+            .background(MaterialTheme.colorScheme.surfaceColorAtElevation(4.dp))
             .fillMaxWidth()
             .clickable {
 
@@ -305,11 +331,24 @@ private fun TitleAchievementCard(
             .padding(16.dp)) {
         Text(text = "Achievements", fontSize = 19.sp, color = MaterialTheme.colorScheme.onSurface)
         Spacer(modifier = Modifier.height(8.dp))
-        LinearProgressIndicator(progress = (achSection.progressPercentage / 100), modifier = Modifier.fillMaxWidth())
+        LinearProgressIndicator(
+            progress = (achSection.progressPercentage / 100),
+            modifier = Modifier.fillMaxWidth()
+        )
         Spacer(modifier = Modifier.height(8.dp))
         Box(Modifier.fillMaxWidth()) {
-            Text(text = "${achSection.currentAchievements} / ${achSection.totalAchievements}", fontSize = 14.sp, color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.7f), modifier = Modifier.align(Alignment.CenterStart))
-            Text(text = "${achSection.currentGamerscore} / ${achSection.totalGamerscore} Gamerscore", fontSize = 14.sp, color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.7f), modifier = Modifier.align(Alignment.CenterEnd))
+            Text(
+                text = "${achSection.currentAchievements} / ${achSection.totalAchievements}",
+                fontSize = 14.sp,
+                color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.7f),
+                modifier = Modifier.align(Alignment.CenterStart)
+            )
+            Text(
+                text = "${achSection.currentGamerscore} / ${achSection.totalGamerscore} Gamerscore",
+                fontSize = 14.sp,
+                color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.7f),
+                modifier = Modifier.align(Alignment.CenterEnd)
+            )
         }
     }
 }
@@ -323,15 +362,20 @@ private fun TitleDevicesCard(
     val ctx = LocalContext.current
     val formattedSize = remember(size) { "approx. ${Formatter.formatFileSize(ctx, size)}" }
 
-    Column(Modifier.padding(horizontal = 16.dp).padding(top = 16.dp)) {
+    Column(
+        Modifier
+            .padding(horizontal = 16.dp)
+            .padding(top = 16.dp)
+    ) {
         Text(text = "Available on", fontSize = 19.sp, color = MaterialTheme.colorScheme.onSurface)
 
         Row {
             devices.forEach { dev ->
                 val data = when (dev) {
+                    "PC" -> "PC" to Icons.Default.Computer
                     "XboxSeries" -> "Xbox Series X|S" to Icons.Default.Gamepad
                     "XboxOne" -> "Xbox One" to Icons.Default.Gamepad
-                    else -> "Unknown" to Icons.Default.Computer
+                    else -> dev to Icons.Default.Computer
                 }
 
                 AssistChip(onClick = { /*TODO*/ }, leadingIcon = {
@@ -345,8 +389,18 @@ private fun TitleDevicesCard(
         }
 
         Box(Modifier.fillMaxWidth()) {
-            Text(text = "Application size", fontSize = 13.sp, color = MaterialTheme.colorScheme.onSurface, modifier = Modifier.align(Alignment.CenterStart))
-            Text(text = formattedSize, fontSize = 13.sp, color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.7f), modifier = Modifier.align(Alignment.CenterEnd))
+            Text(
+                text = "Application size",
+                fontSize = 13.sp,
+                color = MaterialTheme.colorScheme.onSurface,
+                modifier = Modifier.align(Alignment.CenterStart)
+            )
+            Text(
+                text = formattedSize,
+                fontSize = 13.sp,
+                color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.7f),
+                modifier = Modifier.align(Alignment.CenterEnd)
+            )
         }
     }
 }
@@ -367,6 +421,43 @@ private fun TitleCapabilitiesCard(
 
                 Spacer(modifier = Modifier.width(8.dp))
             }
+        }
+    }
+}
+
+@Composable
+private fun TitleHeaderSmall(
+    image: String,
+    name: String,
+    developer: String,
+    publisher: String,
+    modifier: Modifier = Modifier
+) {
+    val joinedDevs = remember(developer, publisher) {
+        return@remember if (developer == publisher) {
+            "$developer"
+        } else {
+            "$developer • $publisher"
+        }
+    }
+
+    Row(modifier) {
+        AsyncImage(
+            model = image,
+            placeholder = ColorPainter(
+                MaterialTheme.colorScheme.surfaceColorAtElevation(4.dp)
+            ),
+            contentDescription = null,
+            modifier = Modifier
+                .align(Alignment.CenterVertically)
+                .clip(RoundedCornerShape(8.dp))
+                .size(42.dp),
+            contentScale = ContentScale.Crop
+        )
+
+        Column(Modifier.padding(start = 16.dp).align(Alignment.CenterVertically)) {
+            Text(text = name, fontSize = 16.sp, maxLines = 1, overflow = TextOverflow.Ellipsis)
+            Text(text = joinedDevs, fontSize = 13.sp, maxLines = 1, overflow = TextOverflow.Ellipsis)
         }
     }
 }
