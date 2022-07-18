@@ -12,3 +12,5 @@ __Application stack:__
 - storage: [MMKV](https://github.com/Tencent/MMKV) (some user metadata)
 - arch: MVVM
 - auth: XAL (more info in xal submodule)
+
+> Please note that Xbox, Xbox Live or other specified trademarks are a property of Microsoft Corporation and are protected by law.
