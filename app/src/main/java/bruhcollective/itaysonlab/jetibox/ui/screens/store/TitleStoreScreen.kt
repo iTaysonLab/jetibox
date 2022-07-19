@@ -28,7 +28,7 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.ViewModel
 import bruhcollective.itaysonlab.jetibox.core.models.titlehub.*
 import bruhcollective.itaysonlab.jetibox.core.service.TitleHubService
-import bruhcollective.itaysonlab.jetibox.ui.LambdaNavigationController
+import bruhcollective.itaysonlab.jetibox.ui.navigation.LocalNavigationWrapper
 import bruhcollective.itaysonlab.jetibox.ui.shared.evo.SmallTopAppBar
 import coil.compose.AsyncImage
 import com.google.accompanist.flowlayout.FlowRow
@@ -42,10 +42,10 @@ import javax.inject.Inject
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun TitleStoreScreen(
-    navController: LambdaNavigationController,
     titleId: String,
     viewModel: TitleStoreScreenViewModel = hiltViewModel()
 ) {
+    val navController = LocalNavigationWrapper.current
     val topBarState = rememberTopAppBarScrollState()
     val scrollBehavior = remember { TopAppBarDefaults.pinnedScrollBehavior(topBarState) }
 

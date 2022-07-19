@@ -12,10 +12,10 @@ import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import bruhcollective.itaysonlab.jetibox.ui.LambdaNavigationController
 import bruhcollective.itaysonlab.jetibox.R
 import bruhcollective.itaysonlab.jetibox.core.xal_bridge.XalBridge
 import bruhcollective.itaysonlab.jetibox.core.xbl_bridge.XblUserController
+import bruhcollective.itaysonlab.jetibox.ui.navigation.LocalNavigationWrapper
 import bruhcollective.itaysonlab.jetibox.ui.screens.Screen
 import com.microsoft.xalwrapper.models.XalUser
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -24,7 +24,6 @@ import javax.inject.Inject
 
 @Composable
 fun LandingScreen(
-    lambdaNavigationController: LambdaNavigationController,
     viewModel: LandingScreenViewModel = hiltViewModel()
 ) {
     val snackbarHostState = remember { SnackbarHostState() }
@@ -74,10 +73,14 @@ fun LandingScreen(
                 .padding(bottom = 8.dp)
                 .fillMaxWidth()
         ) {
-            Button(onClick = { viewModel.launchLogin(
-                onSuccess = { lambdaNavigationController.navigateAndClearStack(Screen.Home) },
-                onFailure = { setSnackbarContent(it.message) }
-            ) }) {
+            val navController = LocalNavigationWrapper.current
+
+            Button(onClick = {
+                viewModel.launchLogin(
+                    onSuccess = { navController.navigateAndClearStack(Screen.Home) },
+                    onFailure = { setSnackbarContent(it.message) }
+                )
+            }) {
                 if (viewModel.isSignInProcess) {
                     CircularProgressIndicator(color = MaterialTheme.colorScheme.onPrimary)
                 } else {

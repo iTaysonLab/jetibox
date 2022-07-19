@@ -1,8 +1,6 @@
 package bruhcollective.itaysonlab.jetibox.ui.screens.home
 
 import androidx.compose.foundation.layout.*
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Notifications
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
@@ -19,7 +17,6 @@ import bruhcollective.itaysonlab.jetibox.core.service.ContentBuilderService
 import bruhcollective.itaysonlab.jetibox.core.service.TitleHubService
 import bruhcollective.itaysonlab.jetibox.core.stream.extractTitlesFromCBLayout
 import bruhcollective.itaysonlab.jetibox.core.xal_bridge.XalBridge
-import bruhcollective.itaysonlab.jetibox.ui.LambdaNavigationController
 import bruhcollective.itaysonlab.jetibox.ui.screens.home.render.HomeLayoutRender
 import bruhcollective.itaysonlab.jetibox.ui.screens.home.render.LayoutStorage
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -29,7 +26,6 @@ import javax.inject.Inject
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun HomeScreen(
-    lambdaNavigationController: LambdaNavigationController,
     viewModel: HomeScreenViewModel = hiltViewModel()
 ) {
     val topBarState = rememberTopAppBarScrollState()
@@ -46,13 +42,6 @@ fun HomeScreen(
                             3.dp
                         )
                     ),
-                    actions = {
-                        IconButton(onClick = {
-
-                        }) {
-                            Icon(Icons.Default.Notifications, contentDescription = null)
-                        }
-                    },
                     contentPadding = PaddingValues(top = with(LocalDensity.current) {
                         WindowInsets.statusBars.getTop(LocalDensity.current).toDp()
                     }),
@@ -63,7 +52,6 @@ fun HomeScreen(
                 .nestedScroll(scrollBehavior.nestedScrollConnection)
         ) { padding ->
             HomeLayoutRender(
-                navController = lambdaNavigationController,
                 data = viewModel.baseLayout!!.layout,
                 storage = viewModel.storage,
                 modifier = Modifier.fillMaxHeight()

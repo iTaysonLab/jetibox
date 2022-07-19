@@ -78,7 +78,6 @@ dependencies {
     implementation "androidx.hilt:hilt-navigation-compose:1.0.0"
 
     implementation "com.google.accompanist:accompanist-navigation-material:$accompanist_version"
-    implementation "com.google.accompanist:accompanist-navigation-animation:$accompanist_version"
     implementation "com.google.accompanist:accompanist-webview:$accompanist_version"
     implementation "com.google.accompanist:accompanist-swiperefresh:$accompanist_version"
     implementation "com.google.accompanist:accompanist-pager:$accompanist_version"

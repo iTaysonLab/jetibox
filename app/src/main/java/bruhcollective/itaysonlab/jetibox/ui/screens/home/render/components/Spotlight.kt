@@ -17,7 +17,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import bruhcollective.itaysonlab.jetibox.core.models.contentbuilder.ContentBuilderDataItem
 import bruhcollective.itaysonlab.jetibox.core.models.contentbuilder.ContentBuilderLayer
-import bruhcollective.itaysonlab.jetibox.ui.LambdaNavigationController
+import bruhcollective.itaysonlab.jetibox.ui.navigation.LocalNavigationWrapper
 import bruhcollective.itaysonlab.jetibox.ui.screens.home.render.LayoutStorage
 import coil.compose.AsyncImage
 import com.google.accompanist.pager.ExperimentalPagerApi
@@ -28,7 +28,6 @@ import com.google.accompanist.pager.rememberPagerState
 @OptIn(ExperimentalPagerApi::class)
 @Composable
 fun Spotlight(
-    navController: LambdaNavigationController,
     items: List<ContentBuilderDataItem>,
     storage: LayoutStorage
 ) {
@@ -40,7 +39,7 @@ fun Spotlight(
             .height(280.dp)
     ) {
         HorizontalPager(count = items.size, state = pagerState) { page ->
-            SpotlightItem(navController, items[page], storage)
+            SpotlightItem(items[page], storage)
         }
 
         HorizontalPagerIndicator(
@@ -66,10 +65,11 @@ fun Spotlight(
 
 @Composable
 private fun SpotlightItem(
-    navController: LambdaNavigationController,
     item: ContentBuilderDataItem,
     storage: LayoutStorage
 ) {
+    val navController = LocalNavigationWrapper.current
+
     val firstLayer = item.itemLayers.first()
     val secondLayer = item.itemLayers[1] as ContentBuilderLayer.Label
 

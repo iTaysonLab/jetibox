@@ -18,13 +18,12 @@ import androidx.compose.ui.unit.sp
 import bruhcollective.itaysonlab.jetibox.core.models.contentbuilder.ContentBuilderDataItem
 import bruhcollective.itaysonlab.jetibox.core.models.titlehub.Title
 import bruhcollective.itaysonlab.jetibox.core.stream.extractTitlesFromCBItem
-import bruhcollective.itaysonlab.jetibox.ui.LambdaNavigationController
+import bruhcollective.itaysonlab.jetibox.ui.navigation.LocalNavigationWrapper
 import bruhcollective.itaysonlab.jetibox.ui.screens.home.render.LayoutStorage
 import coil.compose.AsyncImage
 
 @Composable
 fun Channel(
-    navController: LambdaNavigationController,
     label: String,
     items: List<ContentBuilderDataItem>,
     storage: LayoutStorage
@@ -41,7 +40,7 @@ fun Channel(
             horizontalArrangement = Arrangement.spacedBy(8.dp)
         ) {
             items(filtered) { item ->
-                ChannelItem(navController = navController, title = storage.titles[item]!!)
+                ChannelItem(title = storage.titles[item]!!)
             }
         }
     }
@@ -49,9 +48,10 @@ fun Channel(
 
 @Composable
 private fun ChannelItem(
-    navController: LambdaNavigationController,
     title: Title
 ) {
+    val navController = LocalNavigationWrapper.current
+
     AsyncImage(model = title.displayImage, contentDescription = null, placeholder = ColorPainter(
         MaterialTheme.colorScheme.surfaceColorAtElevation(4.dp)
     ), modifier = Modifier.clip(RoundedCornerShape(8.dp)).size(100.dp).clickable {

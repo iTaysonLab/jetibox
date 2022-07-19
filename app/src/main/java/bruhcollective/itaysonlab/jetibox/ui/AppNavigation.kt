@@ -1,15 +1,10 @@
 package bruhcollective.itaysonlab.jetibox.ui
 
-import android.content.Intent
-import android.net.Uri
-import android.util.Log
-import androidx.annotation.StringRes
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.size
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.Immutable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -20,17 +15,17 @@ import androidx.navigation.compose.composable
 import androidx.navigation.compose.dialog
 import bruhcollective.itaysonlab.jetibox.core.xal_bridge.XalBridge
 import bruhcollective.itaysonlab.jetibox.core.xbl_bridge.XblUserController
-import bruhcollective.itaysonlab.jetibox.ui.screens.BottomSheet
 import bruhcollective.itaysonlab.jetibox.ui.screens.Dialog
 import bruhcollective.itaysonlab.jetibox.ui.screens.Screen
 import bruhcollective.itaysonlab.jetibox.ui.screens.home.HomeScreen
 import bruhcollective.itaysonlab.jetibox.ui.screens.landing.LandingScreen
+import bruhcollective.itaysonlab.jetibox.ui.screens.library.LibraryScreen
+import bruhcollective.itaysonlab.jetibox.ui.screens.profile.ProfileScreen
 import bruhcollective.itaysonlab.jetibox.ui.screens.store.TitleStoreScreen
 
 @Composable
 fun AppNavigation(
   navController: NavHostController,
-  provideLambdaController: LambdaNavigationController,
   xalBridge: XalBridge,
   xblUserController: XblUserController,
   modifier: Modifier
@@ -73,15 +68,23 @@ fun AppNavigation(
     }
 
     composable(Screen.LandingPage.route) {
-      LandingScreen(provideLambdaController)
+      LandingScreen()
     }
 
     composable(Screen.Home.route) {
-      HomeScreen(provideLambdaController)
+      HomeScreen()
     }
 
-    composable(Screen.GameDetail.route) {
-      TitleStoreScreen(provideLambdaController, it.arguments!!.getString("id")!!)
+    composable( Screen.GameDetail.route,) {
+      TitleStoreScreen(it.arguments!!.getString("id")!!)
+    }
+
+    composable(Screen.Library.route,) {
+      LibraryScreen()
+    }
+
+    composable(Screen.Profile.route,) {
+      ProfileScreen()
     }
 
     dialog(Dialog.Logout.route) {
@@ -106,35 +109,4 @@ fun AppNavigation(
       })*/
     }
   }
-}
-
-@JvmInline
-@Immutable
-value class LambdaNavigationController(
-  val controller: () -> NavHostController
-) {
-  @Suppress("DeprecatedCallableAddReplaceWith")
-  @Deprecated(message = "Migrate to navigate(Screen) or navigate(Dialog) if not using arguments")
-  fun navigate(route: String) = controller().navigate(route)
-
-  fun navigate(screen: Screen) = controller().navigate(screen.route)
-  fun navigate(dialog: Dialog) = controller().navigate(dialog.route)
-
-  fun navigate(sheet: BottomSheet, args: Map<String, String>) {
-    var url = sheet.route
-
-    args.forEach { entry ->
-      url = url.replace("{${entry.key}}", entry.value)
-    }
-
-    controller().navigate(url)
-  }
-
-  fun navigateAndClearStack(screen: Screen) = controller().navigate(screen.route) { popUpTo(Screen.NavGraph.route) }
-
-  fun popBackStack() = controller().popBackStack()
-
-  fun context() = controller().context
-  fun string(@StringRes id: Int) = context().getString(id)
-  fun openInBrowser(uri: String) = context().startActivity(Intent(Intent.ACTION_VIEW).setData(Uri.parse(uri)))
 }
