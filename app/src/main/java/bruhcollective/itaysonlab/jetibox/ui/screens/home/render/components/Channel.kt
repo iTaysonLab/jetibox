@@ -17,7 +17,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import bruhcollective.itaysonlab.jetibox.core.models.contentbuilder.ContentBuilderDataItem
 import bruhcollective.itaysonlab.jetibox.core.models.titlehub.Title
-import bruhcollective.itaysonlab.jetibox.core.stream.extractTitlesFromCBItem
+import bruhcollective.itaysonlab.jetibox.core.ext.extractTitlesFromCBItem
 import bruhcollective.itaysonlab.jetibox.ui.navigation.LocalNavigationWrapper
 import bruhcollective.itaysonlab.jetibox.ui.screens.home.render.LayoutStorage
 import coil.compose.AsyncImage

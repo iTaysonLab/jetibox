@@ -14,6 +14,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import bruhcollective.itaysonlab.jetibox.R
 import bruhcollective.itaysonlab.jetibox.core.xal_bridge.XalBridge
+import bruhcollective.itaysonlab.jetibox.core.xal_bridge.XalInitController
 import bruhcollective.itaysonlab.jetibox.core.xbl_bridge.XblUserController
 import bruhcollective.itaysonlab.jetibox.ui.navigation.LocalNavigationWrapper
 import bruhcollective.itaysonlab.jetibox.ui.screens.Screen
@@ -110,7 +111,7 @@ fun LandingScreen(
 @HiltViewModel
 class LandingScreenViewModel @Inject constructor(
     private val xalBridge: XalBridge,
-    private val xblUserController: XblUserController,
+    private val xalInitController: XalInitController
 ) : ViewModel() {
     var isSignInProcess by mutableStateOf(false)
 
@@ -123,7 +124,7 @@ class LandingScreenViewModel @Inject constructor(
         when (val result = xalBridge.requestSignIn()) {
             is XalBridge.XalBridgeSemaphore.Error -> onFailure(result)
             is XalBridge.XalBridgeSemaphore.Success -> {
-                xblUserController.reload()
+                xalInitController.onSignIn()
                 onSuccess(result.result)
             }
         }

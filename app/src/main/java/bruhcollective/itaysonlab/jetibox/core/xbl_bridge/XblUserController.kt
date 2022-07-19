@@ -50,14 +50,14 @@ class XblUserController @Inject constructor(
         xblCurrentUserPreferredColor = "#${xblCurrentUserNotNull.preferredColor.primaryColor}".toColorInt()
         xblCurrentUserTheme = generatePairOf(xblCurrentUserPreferredColor)
 
-        configService.put("xbl.user.color", xblCurrentUserNotNull.preferredColor.primaryColor)
+        configService.userColor = xblCurrentUserNotNull.preferredColor.primaryColor
 
         xblCurrentUserAvailable = true
     }
 
     suspend fun tryRestoring() {
-        if (configService.has("xbl.user.color") && configService.string("xbl.user.color", "").isNotEmpty()) {
-            xblCurrentUserTheme = generatePairOf("#${configService.string("xbl.user.color", "")}".toColorInt())
+        if (configService.userColor.isNotEmpty()) {
+            xblCurrentUserTheme = generatePairOf("#${configService.userColor}".toColorInt())
         }
     }
 

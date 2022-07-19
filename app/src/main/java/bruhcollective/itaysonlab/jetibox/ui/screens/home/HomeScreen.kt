@@ -15,7 +15,7 @@ import androidx.lifecycle.viewModelScope
 import bruhcollective.itaysonlab.jetibox.core.models.contentbuilder.*
 import bruhcollective.itaysonlab.jetibox.core.service.ContentBuilderService
 import bruhcollective.itaysonlab.jetibox.core.service.TitleHubService
-import bruhcollective.itaysonlab.jetibox.core.stream.extractTitlesFromCBLayout
+import bruhcollective.itaysonlab.jetibox.core.ext.extractTitlesFromCBLayout
 import bruhcollective.itaysonlab.jetibox.core.xal_bridge.XalBridge
 import bruhcollective.itaysonlab.jetibox.ui.screens.home.render.HomeLayoutRender
 import bruhcollective.itaysonlab.jetibox.ui.screens.home.render.LayoutStorage

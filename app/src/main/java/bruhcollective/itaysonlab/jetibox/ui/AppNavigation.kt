@@ -13,8 +13,7 @@ import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.dialog
-import bruhcollective.itaysonlab.jetibox.core.xal_bridge.XalBridge
-import bruhcollective.itaysonlab.jetibox.core.xbl_bridge.XblUserController
+import bruhcollective.itaysonlab.jetibox.core.xal_bridge.XalInitController
 import bruhcollective.itaysonlab.jetibox.ui.screens.Dialog
 import bruhcollective.itaysonlab.jetibox.ui.screens.Screen
 import bruhcollective.itaysonlab.jetibox.ui.screens.home.HomeScreen
@@ -26,25 +25,11 @@ import bruhcollective.itaysonlab.jetibox.ui.screens.store.TitleStoreScreen
 @Composable
 fun AppNavigation(
   navController: NavHostController,
-  xalBridge: XalBridge,
-  xblUserController: XblUserController,
+  xalInitController: XalInitController,
   modifier: Modifier
 ) {
   LaunchedEffect(Unit) {
-    val signedIn = if (!xalBridge.initialized) {
-      xblUserController.tryRestoring()
-      xalBridge.initialize()
-
-      val signInTry = xalBridge.tryUsingSavedData() is XalBridge.XalBridgeSemaphore.Success
-
-      if (signInTry) {
-        xblUserController.reload()
-      }
-
-      signInTry
-    } else {
-      xalBridge.currentProfile != null
-    }
+    val signedIn = xalInitController.init()
 
     navController.navigate(
       (if (signedIn) Screen.Home else Screen.LandingPage).route

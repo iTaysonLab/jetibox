@@ -1,4 +1,4 @@
-package bruhcollective.itaysonlab.jetibox.core.service_ktx
+package bruhcollective.itaysonlab.jetibox.core.ext
 
 import retrofit2.Retrofit
 import retrofit2.create

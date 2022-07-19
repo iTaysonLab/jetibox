@@ -2,7 +2,9 @@ package bruhcollective.itaysonlab.jetibox.core.config
 
 import android.util.Log
 import com.tencent.mmkv.MMKV
+import java.util.*
 import javax.inject.Singleton
+import kotlin.reflect.KProperty
 
 class ConfigService {
     private val instance: MMKV = MMKV.defaultMMKV()
@@ -25,5 +27,19 @@ class ConfigService {
             is ByteArray -> instance.putBytes(to, what)
             else -> error("Not supported type")
         }
+    }
+
+    // Implementations
+
+    var userColor: String by StringCfg("xbl.user.color", "")
+
+    var marketCountry: String by StringCfg("xbl.market", "US")
+    var marketLanguage: String by StringCfg("xbl.lang", Locale.getDefault().language)
+
+    // Abstracts
+
+    private inner class StringCfg (private val key: String, private val default: String) {
+        operator fun getValue(thisRef: Any?, property: KProperty<*>) = string(key, default)
+        operator fun setValue(thisRef: Any?, property: KProperty<*>, value: String) = put(key, value)
     }
 }

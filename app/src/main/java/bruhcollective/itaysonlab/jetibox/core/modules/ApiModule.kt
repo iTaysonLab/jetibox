@@ -3,7 +3,8 @@ package bruhcollective.itaysonlab.jetibox.core.modules
 import bruhcollective.itaysonlab.jetibox.core.service.ContentBuilderService
 import bruhcollective.itaysonlab.jetibox.core.service.PeopleHubService
 import bruhcollective.itaysonlab.jetibox.core.service.TitleHubService
-import bruhcollective.itaysonlab.jetibox.core.service_ktx.create
+import bruhcollective.itaysonlab.jetibox.core.ext.create
+import bruhcollective.itaysonlab.jetibox.core.service.DisplayCatalogService
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
@@ -32,4 +33,10 @@ object ApiModule {
     fun providePeopleHub(
         @Named("xalRetrofit") retrofit: Retrofit
     ): PeopleHubService = retrofit.create("https://peoplehub.xboxlive.com")
+
+    @Provides
+    @Singleton
+    fun provideDisplayCatalog(
+        @Named("xalRetrofit") retrofit: Retrofit
+    ): DisplayCatalogService = retrofit.create("https://displaycatalog.md.mp.microsoft.com")
 }

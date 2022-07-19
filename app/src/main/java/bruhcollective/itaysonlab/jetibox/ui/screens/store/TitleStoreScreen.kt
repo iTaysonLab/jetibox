@@ -26,8 +26,10 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.ViewModel
+import bruhcollective.itaysonlab.jetibox.core.config.MsCapDatabase
 import bruhcollective.itaysonlab.jetibox.core.models.titlehub.*
 import bruhcollective.itaysonlab.jetibox.core.service.TitleHubService
+import bruhcollective.itaysonlab.jetibox.core.util.TimeUtils
 import bruhcollective.itaysonlab.jetibox.ui.navigation.LocalNavigationWrapper
 import bruhcollective.itaysonlab.jetibox.ui.shared.evo.SmallTopAppBar
 import coil.compose.AsyncImage
@@ -37,6 +39,7 @@ import com.google.accompanist.pager.HorizontalPager
 import com.google.accompanist.pager.HorizontalPagerIndicator
 import com.google.accompanist.pager.rememberPagerState
 import dagger.hilt.android.lifecycle.HiltViewModel
+import java.text.SimpleDateFormat
 import javax.inject.Inject
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -64,7 +67,9 @@ fun TitleStoreScreen(
                                 data.app.name,
                                 data.app.detail?.developerName.orEmpty(),
                                 data.app.detail?.publisherName.orEmpty(),
-                                Modifier.fillMaxSize().alpha(scrollBehavior.scrollFraction)
+                                Modifier
+                                    .fillMaxSize()
+                                    .alpha(scrollBehavior.scrollFraction)
                             )
                         },
                         navigationIcon = {
@@ -112,22 +117,7 @@ fun TitleStoreScreen(
                     }
 
                     item {
-                        Column(
-                            Modifier
-                                .padding(horizontal = 16.dp)
-                                .padding(bottom = 16.dp)
-                        ) {
-                            Text(
-                                text = "Description",
-                                fontSize = 19.sp,
-                                color = MaterialTheme.colorScheme.onSurface
-                            )
-                            Spacer(modifier = Modifier.height(4.dp))
-                            Text(
-                                text = data.app.detail?.description.orEmpty(),
-                                color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.7f)
-                            )
-                        }
+                        TitleDescriptionCard(short = data.app.detail?.shortDescription.orEmpty(), long = data.app.detail?.description.orEmpty())
                     }
 
                     if (data.appPersonal.achievement != null) {
@@ -137,14 +127,11 @@ fun TitleStoreScreen(
                     }
 
                     item {
-                        TitleDevicesCard(
-                            data.app.devices,
-                            data.app.hardware?.maxDownloadSizeInBytes ?: 0L
-                        )
+                        TitleDevicesCard(data.app.devices, data.app.hardware?.maxDownloadSizeInBytes ?: 0L, data.app.detail?.releaseDate.orEmpty())
                     }
 
                     item {
-                        TitleCapabilitiesCard(data.app.detail?.attributes.orEmpty())
+                        TitleCapabilitiesCard(data.matchedCaps)
                     }
                 }
             }
@@ -164,7 +151,8 @@ fun TitleStoreScreen(
 
 @HiltViewModel
 class TitleStoreScreenViewModel @Inject constructor(
-    private val thApi: TitleHubService
+    private val thApi: TitleHubService,
+    private val msCapDatabase: MsCapDatabase
 ) : ViewModel() {
     var content by mutableStateOf<StoreData>(StoreData.Loading)
         private set
@@ -180,7 +168,11 @@ class TitleStoreScreenViewModel @Inject constructor(
         content = StoreData.Loaded(
             xuid = app.xuid,
             app = app.titles.first(),
-            appPersonal = achievementInfo.titles.first()
+            appPersonal = achievementInfo.titles.first(),
+            matchedCaps = app.titles.first().detail!!.attributes.mapNotNull {
+                msCapDatabase.mObjPFCaps[it.name]
+                    ?.replace("{0}{1}", " (${it.minimum}-${it.maximum})")
+            }
         )
     }
 
@@ -189,6 +181,7 @@ class TitleStoreScreenViewModel @Inject constructor(
             val xuid: String,
             val app: Title,
             val appPersonal: Title,
+            val matchedCaps: List<String>
         ) : StoreData()
 
         object Loading : StoreData()
@@ -357,10 +350,13 @@ private fun TitleAchievementCard(
 @Composable
 private fun TitleDevicesCard(
     devices: List<String>,
-    size: Long
+    size: Long,
+    releaseDate: String
 ) {
     val ctx = LocalContext.current
+
     val formattedSize = remember(size) { "approx. ${Formatter.formatFileSize(ctx, size)}" }
+    val formattedReleaseDate = remember(releaseDate) { TimeUtils.msDateToLocal(releaseDate) }
 
     Column(
         Modifier
@@ -388,37 +384,43 @@ private fun TitleDevicesCard(
             }
         }
 
-        Box(Modifier.fillMaxWidth()) {
-            Text(
-                text = "Application size",
-                fontSize = 13.sp,
-                color = MaterialTheme.colorScheme.onSurface,
-                modifier = Modifier.align(Alignment.CenterStart)
-            )
-            Text(
-                text = formattedSize,
-                fontSize = 13.sp,
-                color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.7f),
-                modifier = Modifier.align(Alignment.CenterEnd)
-            )
-        }
+        TitleSmallCell("Application size", formattedSize)
+        Spacer(modifier = Modifier.height(2.dp))
+        TitleSmallCell("Release date", formattedReleaseDate)
+    }
+}
+
+@Composable
+private fun TitleSmallCell(
+    first: String,
+    second: String
+) {
+    Box(Modifier.fillMaxWidth()) {
+        Text(
+            text = first,
+            fontSize = 13.sp,
+            color = MaterialTheme.colorScheme.onSurface,
+            modifier = Modifier.align(Alignment.CenterStart)
+        )
+        Text(
+            text = second,
+            fontSize = 13.sp,
+            color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.7f),
+            modifier = Modifier.align(Alignment.CenterEnd)
+        )
     }
 }
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 private fun TitleCapabilitiesCard(
-    capabilities: List<TitleAttribute>
+    capabilities: List<String>
 ) {
     Column(Modifier.padding(16.dp)) {
         Text(text = "Capabilities", fontSize = 19.sp, color = MaterialTheme.colorScheme.onSurface)
-
         FlowRow(Modifier.fillMaxWidth()) {
-            capabilities.forEach { dev ->
-                AssistChip(onClick = { /*TODO*/ }, label = {
-                    Text(dev.name)
-                })
-
+            capabilities.forEach { cap ->
+                AssistChip(onClick = {}, label = { Text(cap) })
                 Spacer(modifier = Modifier.width(8.dp))
             }
         }
@@ -455,9 +457,54 @@ private fun TitleHeaderSmall(
             contentScale = ContentScale.Crop
         )
 
-        Column(Modifier.padding(start = 16.dp).align(Alignment.CenterVertically)) {
+        Column(
+            Modifier
+                .padding(start = 16.dp)
+                .align(Alignment.CenterVertically)) {
             Text(text = name, fontSize = 16.sp, maxLines = 1, overflow = TextOverflow.Ellipsis)
             Text(text = joinedDevs, fontSize = 13.sp, maxLines = 1, overflow = TextOverflow.Ellipsis)
+        }
+    }
+}
+
+@Composable
+private fun TitleDescriptionCard(
+    short: String,
+    long: String
+) {
+    val shouldShowExpand = remember(short, long) { short != long }
+    val expanded = remember { mutableStateOf(false) }
+
+    Column(
+        Modifier
+            .padding(horizontal = 16.dp)
+            .padding(bottom = 16.dp)
+    ) {
+        Text(
+            text = "Description",
+            fontSize = 19.sp,
+            color = MaterialTheme.colorScheme.onSurface
+        )
+
+        Spacer(modifier = Modifier.height(4.dp))
+
+        Text(
+            text = if (expanded.value) long else short,
+            fontSize = 13.sp,
+            lineHeight = 18.sp,
+            color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.7f)
+        )
+
+        if (shouldShowExpand) {
+            Text(
+                text = if (expanded.value) "Less" else "More",
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .clickable { expanded.value = !expanded.value }
+                    .padding(vertical = 4.dp),
+                fontSize = 13.sp,
+                color = MaterialTheme.colorScheme.primary
+            )
         }
     }
 }

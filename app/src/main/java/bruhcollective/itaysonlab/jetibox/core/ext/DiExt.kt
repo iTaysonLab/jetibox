@@ -1,4 +1,4 @@
-package bruhcollective.itaysonlab.jetibox.core.service_ktx
+package bruhcollective.itaysonlab.jetibox.core.ext
 
 import okhttp3.OkHttpClient
 import okhttp3.Request

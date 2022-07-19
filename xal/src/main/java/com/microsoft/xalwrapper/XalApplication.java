@@ -168,12 +168,11 @@ public class XalApplication {
     }
 
     public synchronized void Initialize(Context context, String str) {
-        String str2 = TAG;
-        DebugLogger.Log(str2, "Initialize");
+        DebugLogger.Log(TAG, "Initialize");
         this.m_localStoragePath = str;
         if (!this.m_isInitialized) {
             InitializeApp(context);
-            DebugLogger.Log(str2, "Initialize complete");
+            DebugLogger.Log(TAG, "Initialize complete");
             this.m_isInitialized = true;
         }
     }
@@ -257,12 +256,11 @@ public class XalApplication {
     }
 
     public synchronized void XalInitialize(boolean z, boolean z2, boolean z3, boolean z4, long j2, String str, String str2, String str3, int i2, int i3, String str4, final XalInitializeCallback xalInitializeCallback) {
-        String str5 = TAG;
-        DebugLogger.Log(str5, "XalInitialize");
+        DebugLogger.Log(TAG, "XalInitialize");
         this.m_xalLogLevel = i3;
         if (this.m_xalInitializeOperation.isNotRequested()) {
             this.m_xalInitializeOperation.setLoadingState();
-            DebugLogger.Log(str5, "Calling InitializeXal");
+            DebugLogger.Log(TAG, "Calling InitializeXal");
             InitializeXal(z, z2, z3, z4, j2, str, str2, str3, i2, str4, new XalInitializeCallback() {
                 @Override
                 public void onError(int i4, String str6) {

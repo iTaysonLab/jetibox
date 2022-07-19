@@ -16,11 +16,11 @@ import androidx.compose.ui.unit.dp
 import androidx.core.view.WindowCompat
 import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
-import bruhcollective.itaysonlab.jetibox.core.xal_bridge.XalBridge
+import bruhcollective.itaysonlab.jetibox.core.xal_bridge.XalInitController
 import bruhcollective.itaysonlab.jetibox.core.xbl_bridge.XblUserController
 import bruhcollective.itaysonlab.jetibox.ui.AppNavigation
-import bruhcollective.itaysonlab.jetibox.ui.navigation.NavigationWrapper
 import bruhcollective.itaysonlab.jetibox.ui.navigation.LocalNavigationWrapper
+import bruhcollective.itaysonlab.jetibox.ui.navigation.NavigationWrapper
 import bruhcollective.itaysonlab.jetibox.ui.screens.Screen
 import bruhcollective.itaysonlab.jetibox.ui.theme.ApplicationThemeSource
 import bruhcollective.itaysonlab.jetibox.ui.theme.JetiboxTheme
@@ -33,7 +33,7 @@ import javax.inject.Inject
 @AndroidEntryPoint
 class MainActivity : ComponentActivity() {
     @Inject
-    lateinit var xalBridge: XalBridge
+    lateinit var xalInitController: XalInitController
 
     @Inject
     lateinit var xblUserController: XblUserController
@@ -114,8 +114,7 @@ class MainActivity : ComponentActivity() {
                     ) { innerPadding ->
                         AppNavigation(
                             navController = navController,
-                            xalBridge = xalBridge,
-                            xblUserController = xblUserController,
+                            xalInitController = xalInitController,
                             modifier = Modifier
                                 .padding(innerPadding)
                         )

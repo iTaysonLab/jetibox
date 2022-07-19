@@ -1,4 +1,4 @@
-package bruhcollective.itaysonlab.jetibox.core.stream
+package bruhcollective.itaysonlab.jetibox.core.ext
 
 import bruhcollective.itaysonlab.jetibox.core.models.contentbuilder.ContentBuilderDataItem
 import bruhcollective.itaysonlab.jetibox.core.models.contentbuilder.ContentBuilderLayer

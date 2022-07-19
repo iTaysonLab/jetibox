@@ -1,9 +1,11 @@
 package bruhcollective.itaysonlab.jetibox.core.modules
 
 import bruhcollective.itaysonlab.jetibox.core.config.ConfigService
+import bruhcollective.itaysonlab.jetibox.core.config.MsCapDatabase
 import bruhcollective.itaysonlab.jetibox.core.service.PeopleHubService
-import bruhcollective.itaysonlab.jetibox.core.service_ktx.interceptRequest
+import bruhcollective.itaysonlab.jetibox.core.ext.interceptRequest
 import bruhcollective.itaysonlab.jetibox.core.xal_bridge.XalBridge
+import bruhcollective.itaysonlab.jetibox.core.xal_bridge.XalInitController
 import bruhcollective.itaysonlab.jetibox.core.xbl_bridge.XblUserController
 import com.squareup.moshi.Moshi
 import dagger.Module
@@ -32,6 +34,14 @@ object NetworkModule {
     @Provides
     @Singleton
     fun provideXal(): XalBridge = XalBridge()
+
+    @Provides
+    @Singleton
+    fun provideXalInit(
+        xalBridge: XalBridge,
+        xblUserController: XblUserController,
+        msCapDatabase: MsCapDatabase
+    ): XalInitController = XalInitController(xalBridge, xblUserController, msCapDatabase)
 
     @Provides
     @Singleton
