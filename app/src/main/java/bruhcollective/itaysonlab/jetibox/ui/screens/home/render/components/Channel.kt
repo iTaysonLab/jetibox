@@ -15,6 +15,7 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.painter.ColorPainter
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import bruhcollective.itaysonlab.jetibox.core.ext.debugLog
 import bruhcollective.itaysonlab.jetibox.core.models.contentbuilder.ContentBuilderDataItem
 import bruhcollective.itaysonlab.jetibox.core.models.titlehub.Title
 import bruhcollective.itaysonlab.jetibox.core.ext.extractTitlesFromCBItem

@@ -17,6 +17,7 @@ import bruhcollective.itaysonlab.jetibox.core.service.ContentBuilderService
 import bruhcollective.itaysonlab.jetibox.core.service.TitleHubService
 import bruhcollective.itaysonlab.jetibox.core.ext.extractTitlesFromCBLayout
 import bruhcollective.itaysonlab.jetibox.core.xal_bridge.XalBridge
+import bruhcollective.itaysonlab.jetibox.core.xbl_bridge.XblTitleDatabase
 import bruhcollective.itaysonlab.jetibox.ui.screens.home.render.HomeLayoutRender
 import bruhcollective.itaysonlab.jetibox.ui.screens.home.render.LayoutStorage
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -70,9 +71,8 @@ fun HomeScreen(
 
 @HiltViewModel
 class HomeScreenViewModel @Inject constructor(
-    private val xalBridge: XalBridge,
     private val cbApi: ContentBuilderService,
-    private val thService: TitleHubService
+    private val xblTitleDatabase: XblTitleDatabase
 ) : ViewModel() {
     var baseLayout by mutableStateOf<ContentBuilderResponse?>(null)
         private set
@@ -80,15 +80,9 @@ class HomeScreenViewModel @Inject constructor(
     val storage = LayoutStorage()
 
     init {
-        // Start loading
         viewModelScope.launch {
             baseLayout = cbApi.getHomeLayout().also {
-                // this is a mess, thanks MS
-                // TODO migrate to metadata system (probably MMKV-based like Jetispot)
-                storage.fillTitles(
-                    thService = thService,
-                    list = it.layout.extractTitlesFromCBLayout()
-                )
+                storage.fillTitles(xblTitleDatabase = xblTitleDatabase, list = it.layout.extractTitlesFromCBLayout())
             }
         }
     }

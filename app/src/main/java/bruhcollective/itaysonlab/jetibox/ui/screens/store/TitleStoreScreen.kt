@@ -356,7 +356,7 @@ private fun TitleDevicesCard(
     val ctx = LocalContext.current
 
     val formattedSize = remember(size) { "approx. ${Formatter.formatFileSize(ctx, size)}" }
-    val formattedReleaseDate = remember(releaseDate) { TimeUtils.msDateToLocal(releaseDate) }
+    // val formattedReleaseDate = remember(releaseDate) { TimeUtils.msDateToLocal(releaseDate) }
 
     Column(
         Modifier
@@ -385,8 +385,8 @@ private fun TitleDevicesCard(
         }
 
         TitleSmallCell("Application size", formattedSize)
-        Spacer(modifier = Modifier.height(2.dp))
-        TitleSmallCell("Release date", formattedReleaseDate)
+        // Spacer(modifier = Modifier.height(2.dp))
+        // TitleSmallCell("Release date", formattedReleaseDate)
     }
 }
 
