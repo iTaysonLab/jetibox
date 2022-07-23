@@ -21,6 +21,9 @@ enum class Screen(
   LandingPage("landing/core"),
   // store
   GameDetail("game/{id}"),
+  // library
+  ViewScreenshot("capture/screenshot/{json}"),
+  ViewGameclip("capture/gameclip/{json}"),
   // bottom
   Home("home", title = R.string.tab_home),
   Library("library", title = R.string.tab_library),

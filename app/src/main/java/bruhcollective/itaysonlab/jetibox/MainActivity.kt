@@ -27,6 +27,7 @@ import bruhcollective.itaysonlab.jetibox.ui.theme.JetiboxTheme
 import coil.compose.AsyncImage
 import com.google.accompanist.navigation.material.ExperimentalMaterialNavigationApi
 import com.google.accompanist.navigation.material.rememberBottomSheetNavigator
+import com.squareup.moshi.Moshi
 import dagger.hilt.android.AndroidEntryPoint
 import javax.inject.Inject
 
@@ -37,6 +38,9 @@ class MainActivity : ComponentActivity() {
 
     @Inject
     lateinit var xblUserController: XblUserController
+
+    @Inject
+    lateinit var moshi: Moshi
 
     @OptIn(ExperimentalMaterialNavigationApi::class, ExperimentalMaterial3Api::class)
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -53,7 +57,7 @@ class MainActivity : ComponentActivity() {
 
             JetiboxTheme(
                 xblUserController = xblUserController,
-                themeSource = ApplicationThemeSource.XBLUSER
+                themeSource = ApplicationThemeSource.DYNAMIC
             ) {
                 CompositionLocalProvider(LocalNavigationWrapper provides lambdaNavController) {
                     Scaffold(
@@ -114,6 +118,7 @@ class MainActivity : ComponentActivity() {
                     ) { innerPadding ->
                         AppNavigation(
                             navController = navController,
+                            moshi = moshi,
                             xalInitController = xalInitController,
                             modifier = Modifier
                                 .padding(innerPadding)

@@ -1,26 +1,20 @@
 package bruhcollective.itaysonlab.jetibox.ui.screens.library.pages
 
-import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.grid.GridCells
 import androidx.compose.foundation.lazy.grid.GridItemSpan
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
 import androidx.compose.foundation.lazy.grid.items
-import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.DoneAll
 import androidx.compose.material.icons.filled.Image
-import androidx.compose.material.icons.filled.Screenshot
+import androidx.compose.material.icons.filled.SelectAll
 import androidx.compose.material.icons.filled.Videocam
-import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.Text
 import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.painter.ColorPainter
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.layout.ContentScale
@@ -43,6 +37,7 @@ import coil.compose.AsyncImage
 import com.squareup.moshi.Moshi
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.launch
+import okio.ByteString.Companion.encodeUtf8
 import javax.inject.Inject
 
 @Composable
@@ -136,8 +131,8 @@ class CapturesViewModel @Inject constructor(
 
     fun navigateToDetails(navigationWrapper: NavigationWrapper, item: MediaHubEntry) {
         when (item) {
-            is Gameclip -> navigationWrapper.navigate("capture/gameclip/${moshi.adapter(Gameclip::class.java).toJson(item)}")
-            is Screenshot -> navigationWrapper.navigate("capture/screenshot/${moshi.adapter(Screenshot::class.java).toJson(item)}")
+            is Gameclip -> navigationWrapper.navigate("capture/gameclip/${moshi.adapter(Gameclip::class.java).toJson(item).encodeUtf8().base64Url()}")
+            is Screenshot -> navigationWrapper.navigate("capture/screenshot/${moshi.adapter(Screenshot::class.java).toJson(item).encodeUtf8().base64Url()}")
             else -> error("Not supported!")
         }
     }
@@ -154,7 +149,7 @@ class CapturesViewModel @Inject constructor(
     }
 
     enum class ContentFilter (val icon: ImageVector) {
-        Everything(Icons.Default.DoneAll),
+        Everything(Icons.Default.SelectAll),
         Screenshots(Icons.Default.Image),
         Gameclips(Icons.Default.Videocam)
     }

@@ -264,7 +264,7 @@ private fun TitleHeader(
             Modifier
                 .align(Alignment.BottomCenter)
                 .fillMaxWidth()
-                .clip(RoundedCornerShape(topStart = 12.dp, topEnd = 12.dp))
+                .clip(RoundedCornerShape(topStart = 16.dp, topEnd = 16.dp))
                 .height(16.dp)
                 .background(MaterialTheme.colorScheme.surface)
         ) {}
@@ -283,7 +283,7 @@ private fun TitleMedia(
         Modifier
             .offset(y = (-16).dp)
             .fillMaxWidth()
-            .clip(RoundedCornerShape(topStart = 12.dp, topEnd = 12.dp))
+            .clip(RoundedCornerShape(topStart = 16.dp, topEnd = 16.dp))
             .height(200.dp)
     ) {
 

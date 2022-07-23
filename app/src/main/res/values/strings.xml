@@ -9,4 +9,33 @@
     <string name="tab_home">Home</string>
     <string name="tab_library">Library</string>
     <string name="tab_profile">Profile</string>
+
+    <string name="screenshot">Screenshot</string>
+    <string name="gameclip">Gameclip</string>
+
+    <string name="yes">Yes</string>
+    <string name="no">No</string>
+    <string name="cancel">Cancel</string>
+    <string name="dismiss">Dismiss</string>
+    <string name="error">Error</string>
+    <string name="done">Done</string>
+
+    <string name="media_action_download">Download</string>
+    <string name="media_action_delete">Delete from Xbox Live</string>
+
+    <string name="media_prop_resolution">Resolution</string>
+    <string name="media_prop_size">Size</string>
+    <string name="media_prop_date">Upload date</string>
+    <string name="media_prop_hdr">Has HDR version</string>
+    <string name="media_prop_fps">Framerate</string>
+    <string name="media_prop_duration">Duration (seconds)</string>
+
+    <string name="media_cg_actions">Actions</string>
+    <string name="media_cg_props">Properties</string>
+
+    <string name="saving_dialog">Saving to gallery</string>
+
+    <string name="warning_permission">Permissions needed</string>
+    <string name="warning_permission_storage_media">To save media to your device\'s gallery, \"Storage\" permission is required.</string>
+    <string name="warning_permission_manage">Open Settings</string>
 </resources>

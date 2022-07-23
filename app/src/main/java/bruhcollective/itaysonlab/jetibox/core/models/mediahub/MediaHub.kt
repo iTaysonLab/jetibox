@@ -1,5 +1,6 @@
 package bruhcollective.itaysonlab.jetibox.core.models.mediahub
 
+import bruhcollective.itaysonlab.jetibox.core.util.TimeUtils
 import com.squareup.moshi.JsonClass
 import dev.zacsweers.moshix.sealed.annotations.DefaultObject
 import dev.zacsweers.moshix.sealed.annotations.TypeLabel
@@ -30,6 +31,9 @@ class Screenshot(
     override fun getDate() = dateUploaded
     override fun getGameId() = titleId
     override fun getLocators() = contentLocators
+
+    override fun formatResolution() = "${resolutionWidth}x${resolutionHeight}"
+    override fun formatFilename() = "${titleName}_${TimeUtils.msDateToFilename(dateUploaded)}"
 }
 
 @JsonClass(generateAdapter = true)
@@ -55,6 +59,9 @@ class Gameclip(
     override fun getDate() = uploadDate
     override fun getGameId() = titleId
     override fun getLocators() = contentLocators
+
+    override fun formatResolution() = "${resolutionWidth}x${resolutionHeight}"
+    override fun formatFilename() = "${titleName}_${TimeUtils.msDateToFilename(uploadDate)}"
 }
 
 @JsonClass(generateAdapter = true, generator = "sealed:locatorType")
@@ -96,4 +103,7 @@ interface MediaHubEntry {
     fun getDate(): String
     fun getGameId(): Long
     fun getLocators(): List<ContentLocator>
+
+    fun formatResolution(): String
+    fun formatFilename(): String
 }
