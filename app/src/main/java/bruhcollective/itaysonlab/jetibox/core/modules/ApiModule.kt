@@ -42,4 +42,10 @@ object ApiModule {
     fun provideMediaHub(
         @Named("xalRetrofit") retrofit: Retrofit
     ): MediaHubService = retrofit.create("https://mediahub.xboxlive.com")
+
+    @Provides
+    @Singleton
+    fun provideXccs(
+        @Named("xalRetrofit") retrofit: Retrofit
+    ): XccsService = retrofit.create("https://xccs.xboxlive.com")
 }

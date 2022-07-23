@@ -22,6 +22,7 @@ import androidx.compose.ui.unit.Constraints
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.lerp
 import bruhcollective.itaysonlab.jetibox.ui.screens.library.pages.CapturesScreen
+import bruhcollective.itaysonlab.jetibox.ui.screens.library.pages.DevicesScreen
 import com.google.accompanist.pager.*
 import kotlinx.coroutines.launch
 
@@ -50,7 +51,7 @@ fun LibraryScreen(
             LibrarySubpage(
                 name = "Consoles",
                 content = {
-
+                    DevicesScreen()
                 }
             )
         )

@@ -239,7 +239,7 @@ class MediaEntryViewModel @Inject constructor(
                                         progress = state.progress,
                                         modifier = Modifier.fillMaxWidth()
                                     )
-                                    
+
                                     Spacer(modifier = Modifier.height(4.dp))
 
                                     Box(Modifier.fillMaxWidth()) {
