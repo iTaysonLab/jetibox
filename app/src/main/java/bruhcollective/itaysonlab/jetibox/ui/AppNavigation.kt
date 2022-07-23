@@ -3,20 +3,25 @@ package bruhcollective.itaysonlab.jetibox.ui
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.size
-import androidx.compose.material3.CircularProgressIndicator
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.rounded.Warning
+import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.dialog
+import bruhcollective.itaysonlab.jetibox.R
 import bruhcollective.itaysonlab.jetibox.core.models.mediahub.Gameclip
 import bruhcollective.itaysonlab.jetibox.core.models.mediahub.Screenshot
 import bruhcollective.itaysonlab.jetibox.core.xal_bridge.XalInitController
+import bruhcollective.itaysonlab.jetibox.ui.navigation.LocalNavigationWrapper
 import bruhcollective.itaysonlab.jetibox.ui.screens.Dialog
 import bruhcollective.itaysonlab.jetibox.ui.screens.Screen
 import bruhcollective.itaysonlab.jetibox.ui.screens.home.HomeScreen
@@ -91,26 +96,27 @@ fun AppNavigation(
       MediaEntryScreen(entry = parsedObject)
     }
 
-    dialog(Dialog.Logout.route) {
-      /*AlertDialog(onDismissRequest = { navController.popBackStack() }, icon = {
+    dialog(Dialog.AuthDisclaimer.route) {
+      val navigationWrapper = LocalNavigationWrapper.current
+
+      AlertDialog(onDismissRequest = { navController.popBackStack() }, icon = {
         Icon(Icons.Rounded.Warning, null)
       }, title = {
-        Text(stringResource(id = R.string.logout_title))
+        Text(stringResource(id = R.string.disclaimer_title))
       }, text = {
-        Text(stringResource(id = R.string.logout_message))
+        Text(stringResource(id = R.string.disclaimer_text))
       }, confirmButton = {
         TextButton(onClick = {
           navController.popBackStack()
-          //authManager.reset()
-          //android.os.Process.killProcess(android.os.Process.myPid()) // TODO: maybe dynamic restart the session instances?
+          navigationWrapper.openInBrowser("https://github.com/itaysonlab/jetibox")
         }) {
-          Text(stringResource(id = R.string.logout_confirm))
+          Text(stringResource(id = R.string.disclaimer_oss))
         }
       }, dismissButton = {
         TextButton(onClick = { navController.popBackStack() }) {
-          Text(stringResource(id = R.string.logout_cancel))
+          Text(stringResource(id = R.string.dismiss))
         }
-      })*/
+      })
     }
   }
 }

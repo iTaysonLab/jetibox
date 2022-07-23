@@ -2,9 +2,19 @@
     <string name="app_name">Jetibox</string>
 
     <string name="auth_welcome">Welcome to Jetibox!</string>
-    <string name="auth_welcome_text">An experimental Xbox Live client.</string>
+    <string name="auth_welcome_text">An unofficial experimental Xbox Live client.</string>
     <string name="auth_sign">Sign in</string>
     <string name="auth_disclaimer">View disclaimers</string>
+
+    <string name="disclaimer_title">Disclaimer</string>
+
+    <string name="disclaimer_text">
+        This application is an unofficial client for Xbox Live network, and neither this app or the developer(s) are not connected to Microsoft and does not use any of NDA-covered information.
+        \n\nThe only thing that is from Microsoft is XAL, the authorization layer - to keep your account data safe and not to interfere with any security measures. The code and the library are taken from the official Xbox companion application.
+        \n\nAlso please note that Xbox, Xbox Live or other specified trademarks are a property of Microsoft Corporation and are protected by law.
+    </string>
+
+    <string name="disclaimer_oss">View sources</string>
 
     <string name="tab_home">Home</string>
     <string name="tab_library">Library</string>
@@ -38,4 +48,9 @@
     <string name="warning_permission">Permissions needed</string>
     <string name="warning_permission_storage_media">To save media to your device\'s gallery, \"Storage\" permission is required.</string>
     <string name="warning_permission_manage">Open Settings</string>
+
+    <string name="device_state_off">Off</string>
+    <string name="device_state_on">On</string>
+    <string name="device_state_standby">Standby</string>
+    <string name="device_storage_free">%s free</string>
 </resources>

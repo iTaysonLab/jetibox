@@ -17,6 +17,7 @@ import bruhcollective.itaysonlab.jetibox.core.xal_bridge.XalBridge
 import bruhcollective.itaysonlab.jetibox.core.xal_bridge.XalInitController
 import bruhcollective.itaysonlab.jetibox.core.xbl_bridge.XblUserController
 import bruhcollective.itaysonlab.jetibox.ui.navigation.LocalNavigationWrapper
+import bruhcollective.itaysonlab.jetibox.ui.screens.Dialog
 import bruhcollective.itaysonlab.jetibox.ui.screens.Screen
 import com.microsoft.xalwrapper.models.XalUser
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -89,7 +90,9 @@ fun LandingScreen(
                 }
             }
 
-            TextButton(onClick = { }) {
+            TextButton(onClick = {
+                navController.navigate(Dialog.AuthDisclaimer)
+            }) {
                 Text(text = stringResource(id = R.string.auth_disclaimer))
             }
         }
