@@ -40,6 +40,9 @@
     <string name="media_prop_fps">Framerate</string>
     <string name="media_prop_duration">Duration (seconds)</string>
 
+    <string name="media_save_hdr">Download HDR version?</string>
+    <string name="media_save_hdr_text">This media file has also a HDR variation, saved into JXR format (JPEG-XR).\n\nHowever, this format might be not supported on your device.</string>
+
     <string name="media_cg_actions">Actions</string>
     <string name="media_cg_props">Properties</string>
 

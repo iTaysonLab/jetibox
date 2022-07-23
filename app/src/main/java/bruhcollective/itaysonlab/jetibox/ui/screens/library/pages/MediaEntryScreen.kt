@@ -35,6 +35,7 @@ import bruhcollective.itaysonlab.jetibox.R
 import bruhcollective.itaysonlab.jetibox.core.models.mediahub.ContentLocator
 import bruhcollective.itaysonlab.jetibox.core.models.mediahub.Gameclip
 import bruhcollective.itaysonlab.jetibox.core.models.mediahub.MediaHubEntry
+import bruhcollective.itaysonlab.jetibox.core.models.mediahub.Screenshot
 import bruhcollective.itaysonlab.jetibox.core.models.titlehub.Title
 import bruhcollective.itaysonlab.jetibox.core.util.GalleryUtils
 import bruhcollective.itaysonlab.jetibox.core.util.TimeUtils
@@ -42,125 +43,130 @@ import bruhcollective.itaysonlab.jetibox.core.xbl_bridge.XblTitleDatabase
 import bruhcollective.itaysonlab.jetibox.ui.navigation.LocalNavigationWrapper
 import bruhcollective.itaysonlab.jetibox.ui.shared.FullScreenLoading
 import coil.compose.AsyncImage
+import com.squareup.moshi.Moshi
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.delay
-import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.launch
+import okio.ByteString.Companion.decodeBase64
 import javax.inject.Inject
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun MediaEntryScreen(
-    entry: MediaHubEntry,
+    json: String,
+    isGameclip: Boolean,
     viewModel: MediaEntryViewModel = hiltViewModel()
 ) {
     val navWrapper = LocalNavigationWrapper.current
-    val isGameclip = remember(entry) { entry is Gameclip }
-    val fullResLocator =
-        remember(entry) { entry.getLocators().filterIsInstance<ContentLocator.Download>().first() }
-    val thumbnailLocator = remember(entry) {
-        entry.getLocators().filterIsInstance<ContentLocator.LargeThumbnail>().first()
-    }
 
-    LaunchedEffect(Unit) { viewModel.loadTitle(navWrapper.context(), entry) }
+    LaunchedEffect(Unit) { viewModel.loadTitle(navWrapper.context(), json, isGameclip) }
 
-    if (viewModel.titleState != null) {
-        Scaffold(
-            topBar = {
-                SmallTopAppBar(title = {
-                    HeaderSmall(
-                        image = viewModel.titleState!!.displayImage,
-                        title = stringResource(id = if (isGameclip) R.string.gameclip else R.string.screenshot),
-                        subtitle = viewModel.titleState!!.name,
-                    )
-                }, navigationIcon = {
-                    IconButton(onClick = { navWrapper.popBackStack() }) {
-                        Icon(Icons.Default.ArrowBack, contentDescription = null)
-                    }
-                })
-            }, modifier = Modifier.statusBarsPadding()
-        ) { padding ->
-            Surface(
-                tonalElevation = 1.dp, modifier = Modifier
-                    .padding(padding)
-                    .fillMaxSize()
-                    .clip(RoundedCornerShape(topStart = 16.dp, topEnd = 16.dp))
-            ) {
-
-                LazyColumn {
-                    item {
-                        MediaEntryImage(image = if (isGameclip) thumbnailLocator.uri else fullResLocator.uri)
-                    }
-
-                    item {
-                        Category(text = stringResource(id = R.string.media_cg_actions))
-                    }
-
-                    items(viewModel.entryActions) { item ->
-                        ListItem(
-                            leadingContent = {
-                                Icon(item.icon, contentDescription = null)
-                            }, headlineText = {
-                                Text(stringResource(id = item.title))
-                            }, modifier = Modifier.clickable {
-                                item.action()
-                            }
+    when (val state = viewModel.state) {
+        MediaEntryViewModel.State.Loading -> FullScreenLoading()
+        is MediaEntryViewModel.State.Ready -> {
+            Scaffold(
+                topBar = {
+                    SmallTopAppBar(title = {
+                        HeaderSmall(
+                            image = state.title.displayImage,
+                            title = stringResource(id = if (isGameclip) R.string.gameclip else R.string.screenshot),
+                            subtitle = state.title.name,
                         )
-                    }
+                    }, navigationIcon = {
+                        IconButton(onClick = { navWrapper.popBackStack() }) {
+                            Icon(Icons.Default.ArrowBack, contentDescription = null)
+                        }
+                    })
+                }, modifier = Modifier.statusBarsPadding()
+            ) { padding ->
+                Surface(
+                    tonalElevation = 1.dp, modifier = Modifier
+                        .padding(padding)
+                        .fillMaxSize()
+                        .clip(RoundedCornerShape(topStart = 16.dp, topEnd = 16.dp))
+                ) {
+                    LazyColumn {
+                        item {
+                            MediaEntryImage(image = state.thumbnailUrl)
+                        }
 
-                    item {
-                        Category(text = stringResource(id = R.string.media_cg_props))
-                    }
+                        item {
+                            Category(text = stringResource(id = R.string.media_cg_actions))
+                        }
 
-                    items(viewModel.entryProperties) { item ->
-                        ListItem(
-                            leadingContent = {
-                                Icon(item.icon, contentDescription = null)
-                            }, headlineText = {
-                                Text(stringResource(id = item.title))
-                            }, supportingText = {
-                                Text(item.subtitle)
-                            }
-                        )
+                        items(state.actions) { item ->
+                            ListItem(
+                                leadingContent = {
+                                    Icon(item.icon, contentDescription = null)
+                                }, headlineText = {
+                                    Text(stringResource(id = item.title))
+                                }, modifier = Modifier.clickable {
+                                    item.action()
+                                }
+                            )
+                        }
+
+                        item {
+                            Category(text = stringResource(id = R.string.media_cg_props))
+                        }
+
+                        items(state.properties) { item ->
+                            ListItem(
+                                leadingContent = {
+                                    Icon(item.icon, contentDescription = null)
+                                }, headlineText = {
+                                    Text(stringResource(id = item.title))
+                                }, supportingText = {
+                                    Text(item.subtitle)
+                                }
+                            )
+                        }
                     }
                 }
-            }
 
-            viewModel.currentDialog()
+                viewModel.currentDialog()
+            }
         }
-    } else {
-        FullScreenLoading()
     }
 }
 
 @HiltViewModel
 class MediaEntryViewModel @Inject constructor(
-    private val xblTitleDatabase: XblTitleDatabase
+    private val xblTitleDatabase: XblTitleDatabase,
+    private val moshi: Moshi
 ) : ViewModel() {
     var currentDialog by mutableStateOf<@Composable () -> Unit>({})
 
-    var entryActions = mutableStateListOf<Action>()
-    var entryProperties = mutableStateListOf<Property>()
-
-    var titleState by mutableStateOf<Title?>(null)
+    var state by mutableStateOf<State>(State.Loading)
         private set
 
-    suspend fun loadTitle(context: Context, entry: MediaHubEntry) {
-        if (titleState != null) return
+    suspend fun loadTitle(context: Context, json: String, isGameclip: Boolean) {
+        if (state != State.Loading) return
 
-        val isGameclip = entry is Gameclip
+        val entry = moshi.adapter(
+            if (isGameclip) Gameclip::class.java else Screenshot::class.java
+        ).fromJson(json.decodeBase64()!!.string(Charsets.UTF_8))!!
+
+        val title = xblTitleDatabase.getTitles(listOf(entry.getGameId())).values.first()
+
         val fullResLocator = entry.getLocators().filterIsInstance<ContentLocator.Download>().first()
-        val hasHdr = entry.getLocators().filterIsInstance<ContentLocator.DownloadHDR>().isNotEmpty()
+        val hdrLocator = entry.getLocators().filterIsInstance<ContentLocator.DownloadHDR>().firstOrNull()
+        val thumbnail = entry.getLocators().filterIsInstance<ContentLocator.LargeThumbnail>().first()
+        val hasHdr = hdrLocator != null
 
-        entryActions.addAll(buildList {
+        val actions = buildList {
             add(Action(Icons.Default.Save, R.string.media_action_download) {
-                viewModelScope.launch { requestToDownload(context, entry) }
+                if (hasHdr) {
+                    promptForHdr()
+                } else {
+                    viewModelScope.launch { requestToDownload(context, state as State.Ready) }
+                }
             })
 
             // add(Action(Icons.Default.Delete, R.string.media_action_delete) {})
-        })
+        }
 
-        entryProperties.addAll(buildList {
+        val properties = buildList {
             add(
                 Property(
                     Icons.Default.FileDownload,
@@ -214,17 +220,55 @@ class MediaEntryViewModel @Inject constructor(
                     )
                 )
             }
-        })
+        }
 
-        titleState = xblTitleDatabase.getTitles(listOf(entry.getGameId())).values.first()
+        state = State.Ready(
+            title = title,
+            isGameclip = isGameclip,
+            fullResLocator = fullResLocator,
+            hdrLocator = hdrLocator,
+            thumbnailUrl = if (isGameclip) thumbnail.uri else fullResLocator.uri,
+            actions = actions,
+            properties = properties,
+            fileName = entry.formatFilename()
+        )
     }
 
-    private suspend fun requestToDownload(context: Context, entry: MediaHubEntry) {
+    private fun promptForHdr() {
+        currentDialog = {
+            val context = LocalContext.current
+
+            val dlFunc = { hdr: Boolean ->
+                currentDialog = {}
+                viewModelScope.launch { requestToDownload(context, state as State.Ready, hdr = hdr) }
+            }
+
+            AlertDialog(
+                onDismissRequest = { currentDialog = {} },
+                icon = { Icon(Icons.Default.HdrOn, contentDescription = null) },
+                title = { Text(stringResource(id = R.string.media_save_hdr)) },
+                text = { Text(stringResource(id = R.string.media_save_hdr_text)) },
+                confirmButton = {
+                    TextButton(onClick = { dlFunc(true) }) {
+                        Text(stringResource(id = R.string.yes))
+                    }
+                },
+                dismissButton = {
+                    TextButton(onClick = { dlFunc(false) }) {
+                        Text(stringResource(id = R.string.no))
+                    }
+                },
+            )
+        }
+    }
+
+    private suspend fun requestToDownload(context: Context, state: State.Ready, hdr: Boolean = false) {
         GalleryUtils.saveToGallery(
             ctx = context,
-            url = entry.getLocators().filterIsInstance<ContentLocator.Download>().first().uri,
-            video = entry is Gameclip,
-            filename = entry.getEntryId()
+            url = if (hdr) state.hdrLocator?.uri ?: state.fullResLocator.uri else state.fullResLocator.uri,
+            video = state.isGameclip,
+            filename = state.fileName + if (hdr) "_HDR" else "",
+            hdr = hdr
         ).collect { state ->
             currentDialog = {
                 when (state) {
@@ -319,7 +363,7 @@ class MediaEntryViewModel @Inject constructor(
 
                     GalleryUtils.SaveToGalleryState.Success -> {
                         LaunchedEffect(Unit) {
-                            delay(250L)
+                            delay(500L)
                             currentDialog = {}
                         }
 
@@ -341,6 +385,21 @@ class MediaEntryViewModel @Inject constructor(
 
     class Action(val icon: ImageVector, val title: Int, val action: () -> Unit)
     class Property(val icon: ImageVector, val title: Int, val subtitle: String)
+
+    sealed class State {
+        object Loading : State()
+
+        class Ready(
+            val title: Title,
+            val fileName: String,
+            val isGameclip: Boolean,
+            val fullResLocator: ContentLocator.Download,
+            val hdrLocator: ContentLocator.DownloadHDR?,
+            val thumbnailUrl: String,
+            val actions: List<Action>,
+            val properties: List<Property>
+        ) : State()
+    }
 }
 
 @Composable

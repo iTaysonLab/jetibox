@@ -24,6 +24,8 @@ enum class Screen(
   // library
   ViewScreenshot("capture/screenshot/{json}"),
   ViewGameclip("capture/gameclip/{json}"),
+  // device
+  ConsoleManagement("console/{json}"),
   // bottom
   Home("home", title = R.string.tab_home),
   Library("library", title = R.string.tab_library),

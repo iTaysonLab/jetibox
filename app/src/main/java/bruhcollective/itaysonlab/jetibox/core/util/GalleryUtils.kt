@@ -26,7 +26,8 @@ object GalleryUtils {
         ctx: Context,
         url: String,
         filename: String,
-        video: Boolean
+        video: Boolean,
+        hdr: Boolean,
     ): Flow<SaveToGalleryState> = flow {
         if (Peko.requestPermissionsAsync(
                 ctx,
@@ -39,8 +40,8 @@ object GalleryUtils {
 
         provideOutputSink(
             ctx.applicationContext,
-            filename + "." + if (video) "mp4" else "png",
-            video
+            filename + "." + if (video) "mp4" else if (hdr) "jxr" else "png",
+            video, hdr
         ) { sink ->
             OkHttpClient().newCall(Request.Builder().url(url).build()).execute().body?.use { body ->
                 val bytesSize = body.contentLength().toFloat()
@@ -73,10 +74,11 @@ object GalleryUtils {
         ctx: Context,
         filename: String,
         video: Boolean,
+        hdr: Boolean,
         process: suspend (BufferedSink) -> Unit
     ) {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
-            saveModern(ctx, filename, video, process)
+            saveModern(ctx, filename, video, hdr, process)
         } else {
             saveLegacy(ctx, filename, video, process)
         }
@@ -87,13 +89,14 @@ object GalleryUtils {
         ctx: Context,
         filename: String,
         video: Boolean,
+        hdr: Boolean,
         process: suspend (BufferedSink) -> Unit
     ) {
         val imageUri = ctx.contentResolver.insert(
             if (video) MediaStore.Video.Media.EXTERNAL_CONTENT_URI else MediaStore.Images.Media.EXTERNAL_CONTENT_URI,
             ContentValues().apply {
                 put(MediaStore.MediaColumns.DISPLAY_NAME, filename)
-                put(MediaStore.MediaColumns.MIME_TYPE, if (video) "video/mp4" else "image/png")
+                put(MediaStore.MediaColumns.MIME_TYPE, if (video) "video/mp4" else if (hdr) "image/jpeg" else "image/png")
                 put(
                     MediaStore.MediaColumns.RELATIVE_PATH,
                     if (video) Environment.DIRECTORY_MOVIES else Environment.DIRECTORY_PICTURES

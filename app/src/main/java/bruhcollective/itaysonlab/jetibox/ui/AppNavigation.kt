@@ -8,7 +8,6 @@ import androidx.compose.material.icons.rounded.Warning
 import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
@@ -18,8 +17,6 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.dialog
 import bruhcollective.itaysonlab.jetibox.R
-import bruhcollective.itaysonlab.jetibox.core.models.mediahub.Gameclip
-import bruhcollective.itaysonlab.jetibox.core.models.mediahub.Screenshot
 import bruhcollective.itaysonlab.jetibox.core.xal_bridge.XalInitController
 import bruhcollective.itaysonlab.jetibox.ui.navigation.LocalNavigationWrapper
 import bruhcollective.itaysonlab.jetibox.ui.screens.Dialog
@@ -30,13 +27,10 @@ import bruhcollective.itaysonlab.jetibox.ui.screens.library.LibraryScreen
 import bruhcollective.itaysonlab.jetibox.ui.screens.library.pages.MediaEntryScreen
 import bruhcollective.itaysonlab.jetibox.ui.screens.profile.ProfileScreen
 import bruhcollective.itaysonlab.jetibox.ui.screens.store.TitleStoreScreen
-import com.squareup.moshi.Moshi
-import okio.ByteString.Companion.decodeBase64
 
 @Composable
 fun AppNavigation(
   navController: NavHostController,
-  moshi: Moshi,
   xalInitController: XalInitController,
   modifier: Modifier
 ) {
@@ -85,15 +79,11 @@ fun AppNavigation(
     }
 
     composable(Screen.ViewScreenshot.route) {
-      val json = it.arguments?.getString("json") ?: ""
-      val parsedObject = remember(json) { moshi.adapter(Screenshot::class.java).fromJson(json.decodeBase64()!!.string(Charsets.UTF_8))!! }
-      MediaEntryScreen(entry = parsedObject)
+      MediaEntryScreen(json = it.arguments?.getString("json") ?: "", isGameclip = false)
     }
 
     composable(Screen.ViewGameclip.route) {
-      val json = it.arguments?.getString("json") ?: ""
-      val parsedObject = remember(json) { moshi.adapter(Gameclip::class.java).fromJson(json.decodeBase64()!!.string(Charsets.UTF_8))!! }
-      MediaEntryScreen(entry = parsedObject)
+      MediaEntryScreen(json = it.arguments?.getString("json") ?: "", isGameclip = true)
     }
 
     dialog(Dialog.AuthDisclaimer.route) {
