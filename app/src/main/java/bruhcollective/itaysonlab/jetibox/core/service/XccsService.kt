@@ -36,4 +36,11 @@ interface XccsService {
         @Header("x-xbl-opid") operationId: String,
         @Header("x-xbl-deviceid") deviceId: String,
     ): XccsOperationQuery
+
+    @PUT("/consoles/{consoleId}/name")
+    @Headers("skillplatform: RemoteManagement", "x-xbl-contract-version: 4")
+    suspend fun changeConsoleName(
+        @Path("consoleId") consoleId: String,
+        @Body body: Map<String, String>
+    ): XccsStatus
 }

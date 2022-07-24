@@ -29,6 +29,7 @@
     <string name="dismiss">Dismiss</string>
     <string name="error">Error</string>
     <string name="done">Done</string>
+    <string name="confirm">Confirm</string>
 
     <string name="media_action_download">Download</string>
     <string name="media_action_delete">Delete from Xbox Live</string>
@@ -56,4 +57,10 @@
     <string name="device_state_on">On</string>
     <string name="device_state_standby">Standby</string>
     <string name="device_storage_free">%s free</string>
+    <string name="device_storage_free_of">%s free of %s</string>
+
+    <string name="app_dlc_alert">Installed DLC</string>
+    <string name="app_dlc_installcount">%d DLC installed</string>
+    <string name="console_rename">Rename console</string>
+    <string name="console_rename_hint">New name</string>
 </resources>

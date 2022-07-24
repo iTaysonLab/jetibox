@@ -11,9 +11,8 @@ import bruhcollective.itaysonlab.jetibox.core.models.peoplehub.XblPerson
 import bruhcollective.itaysonlab.jetibox.core.service.PeopleHubService
 import bruhcollective.itaysonlab.jetibox.core.xal_bridge.XalBridge
 import bruhcollective.itaysonlab.jetibox.ui.monet.ColorToScheme
-import javax.inject.Inject
 
-class XblUserController @Inject constructor(
+class XblUserController(
     private val xalBridge: XalBridge,
     private val phApi: PeopleHubService,
     private val configService: ConfigService

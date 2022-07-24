@@ -5,10 +5,12 @@ import bruhcollective.itaysonlab.jetibox.core.config.MsCapDatabase
 import bruhcollective.itaysonlab.jetibox.core.service.PeopleHubService
 import bruhcollective.itaysonlab.jetibox.core.ext.interceptRequest
 import bruhcollective.itaysonlab.jetibox.core.service.TitleHubService
+import bruhcollective.itaysonlab.jetibox.core.service.XccsService
 import bruhcollective.itaysonlab.jetibox.core.xal_bridge.XalBridge
 import bruhcollective.itaysonlab.jetibox.core.xal_bridge.XalInitController
 import bruhcollective.itaysonlab.jetibox.core.xbl_bridge.XblTitleDatabase
 import bruhcollective.itaysonlab.jetibox.core.xbl_bridge.XblUserController
+import bruhcollective.itaysonlab.jetibox.core.xbl_bridge.XccsController
 import com.squareup.moshi.Moshi
 import dagger.Binds
 import dagger.Module
@@ -91,4 +93,10 @@ object NetworkModule {
         moshi: Moshi,
         service: TitleHubService
     ) = XblTitleDatabase(database, moshi, service)
+
+    @Provides
+    @Singleton
+    fun provideXccsController(
+        service: XccsService
+    ) = XccsController(service)
 }

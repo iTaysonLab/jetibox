@@ -248,7 +248,7 @@ private fun TitleHeader(
                 Text(joinedGenres, color = Color.White.copy(alpha = 0.7f))
             }
 
-            Spacer(modifier = Modifier.height(6.dp))
+            /*Spacer(modifier = Modifier.height(6.dp))
 
             Button(
                 onClick = { /*TODO*/ }, colors = ButtonDefaults.buttonColors(
@@ -257,7 +257,7 @@ private fun TitleHeader(
                 )
             ) {
                 Text("Download")
-            }
+            }*/
         }
 
         Box(

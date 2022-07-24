@@ -1,9 +1,8 @@
 package bruhcollective.itaysonlab.jetibox.core.config
 
-import android.util.Log
+import bruhcollective.itaysonlab.jetibox.core.ext.debugLog
 import com.tencent.mmkv.MMKV
 import java.util.*
-import javax.inject.Singleton
 import kotlin.reflect.KProperty
 
 class ConfigService {
@@ -18,7 +17,7 @@ class ConfigService {
     fun bytes(of: String, def: ByteArray) = instance.getBytes(of, def)!!
 
     fun put(to: String, what: Any) {
-        Log.d("MMKVService", "[put] $what -> $to [in: ${instance.allKeys()?.joinToString()}]")
+        debugLog("MMKVService", "[put] $what -> $to [in: ${instance.allKeys()?.joinToString()}]")
         when (what) {
             is String -> instance.putString(to, what)
             is Int -> instance.putInt(to, what)

@@ -9,7 +9,6 @@ import com.squareup.moshi.Moshi
 import com.squareup.moshi.adapter
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
-import javax.inject.Inject
 
 class XblTitleDatabase(
     private val database: ConfigService,

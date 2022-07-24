@@ -62,7 +62,7 @@ enum class ConsoleType(
 
 @JsonClass(generateAdapter = true)
 data class InstalledApp(
-    val oneStoreProductId: String,
+    val oneStoreProductId: String?,
     val titleId: Long,
     val aumid: String?,
     val isGame: Boolean,

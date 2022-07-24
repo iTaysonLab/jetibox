@@ -21,6 +21,7 @@ import bruhcollective.itaysonlab.jetibox.core.xal_bridge.XalInitController
 import bruhcollective.itaysonlab.jetibox.ui.navigation.LocalNavigationWrapper
 import bruhcollective.itaysonlab.jetibox.ui.screens.Dialog
 import bruhcollective.itaysonlab.jetibox.ui.screens.Screen
+import bruhcollective.itaysonlab.jetibox.ui.screens.device.ConsoleManagementScreen
 import bruhcollective.itaysonlab.jetibox.ui.screens.home.HomeScreen
 import bruhcollective.itaysonlab.jetibox.ui.screens.landing.LandingScreen
 import bruhcollective.itaysonlab.jetibox.ui.screens.library.LibraryScreen
@@ -84,6 +85,10 @@ fun AppNavigation(
 
     composable(Screen.ViewGameclip.route) {
       MediaEntryScreen(json = it.arguments?.getString("json") ?: "", isGameclip = true)
+    }
+
+    composable(Screen.ConsoleManagement.route) {
+      ConsoleManagementScreen(json = it.arguments?.getString("json") ?: "")
     }
 
     dialog(Dialog.AuthDisclaimer.route) {
