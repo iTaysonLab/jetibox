@@ -63,4 +63,7 @@
     <string name="app_dlc_installcount">%d DLC installed</string>
     <string name="console_rename">Rename console</string>
     <string name="console_rename_hint">New name</string>
+
+    <string name="app_delete_title">Uninstall?</string>
+    <string name="app_delete_text">This will uninstall %s from %s.\n\nYou can reinstall it later at any time.</string>
 </resources>

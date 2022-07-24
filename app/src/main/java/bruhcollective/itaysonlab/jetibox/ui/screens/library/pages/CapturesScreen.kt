@@ -34,6 +34,8 @@ import bruhcollective.itaysonlab.jetibox.ui.shared.FullScreenError
 import bruhcollective.itaysonlab.jetibox.ui.shared.FullScreenLoading
 import bruhcollective.itaysonlab.jetibox.ui.shared.components.CompositeSwitch
 import coil.compose.AsyncImage
+import com.google.accompanist.swiperefresh.SwipeRefresh
+import com.google.accompanist.swiperefresh.rememberSwipeRefreshState
 import com.squareup.moshi.Moshi
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.launch
@@ -51,21 +53,23 @@ fun CapturesScreen(
         is CapturesViewModel.State.Error -> FullScreenError(state.e)
 
         is CapturesViewModel.State.Ready -> {
-            LazyVerticalGrid(
-                columns = GridCells.Fixed(3),
-                horizontalArrangement = Arrangement.spacedBy(8.dp),
-                verticalArrangement = Arrangement.spacedBy(8.dp),
-                contentPadding = PaddingValues(16.dp)
-            ) {
-                item(span = { GridItemSpan(3) }) {
-                    CapturesHeader(
-                        contentFilter = viewModel.contentFilter,
-                        onSetContentFilter = viewModel::setContentFilterPub
-                    )
-                }
+            SwipeRefresh(state = rememberSwipeRefreshState(viewModel.isReloading), onRefresh = { viewModel.reload() }) {
+                LazyVerticalGrid(
+                    columns = GridCells.Fixed(3),
+                    horizontalArrangement = Arrangement.spacedBy(8.dp),
+                    verticalArrangement = Arrangement.spacedBy(8.dp),
+                    contentPadding = PaddingValues(16.dp)
+                ) {
+                    item(span = { GridItemSpan(3) }) {
+                        CapturesHeader(
+                            contentFilter = viewModel.contentFilter,
+                            onSetContentFilter = viewModel::setContentFilterPub
+                        )
+                    }
 
-                items(state.content, key = { it.getEntryId() }) { item ->
-                    CaptureEntry(item, onClick = { viewModel.navigateToDetails(navWrapper, item) })
+                    items(state.content, key = { it.getEntryId() }) { item ->
+                        CaptureEntry(item, onClick = { viewModel.navigateToDetails(navWrapper, item) })
+                    }
                 }
             }
         }
@@ -85,14 +89,24 @@ class CapturesViewModel @Inject constructor(
     var contentFilter by mutableStateOf(ContentFilter.Everything)
         private set
 
+    var isReloading by mutableStateOf(false)
+        private set
+
     private var statePrototype: State.Ready? = null
 
     init {
         viewModelScope.launch { load() }
     }
 
+    fun reload() {
+        viewModelScope.launch {
+            isReloading = true
+            load()
+            isReloading = false
+        }
+    }
+
     private suspend fun load() {
-        state = State.Loading
         state = try {
             val xuid = xblUserController.xblCurrentUserNotNull.xuid
 
@@ -107,7 +121,7 @@ class CapturesViewModel @Inject constructor(
             State.Ready(
                 content = sort(combined),
                 titles = titles
-            ).also { statePrototype = it }
+            ).also { statePrototype = it; }
         } catch (e: Exception) {
             e.printStackTrace()
             State.Error(e)
@@ -166,7 +180,9 @@ private fun CaptureEntry(
         AsyncImage(
             model = item.getLocators().first { it is ContentLocator.LargeThumbnail }.uri,
             contentDescription = null,
-            modifier = Modifier.fillMaxSize().clickable(onClick = onClick),
+            modifier = Modifier
+                .fillMaxSize()
+                .clickable(onClick = onClick),
             contentScale = ContentScale.Crop,
             placeholder = ColorPainter(MaterialTheme.colorScheme.surface)
         )
@@ -178,7 +194,9 @@ private fun CapturesHeader(
     contentFilter: CapturesViewModel.ContentFilter,
     onSetContentFilter: (CapturesViewModel.ContentFilter) -> Unit
 ) {
-    Box(modifier = Modifier.fillMaxWidth().padding(bottom = 8.dp)) {
+    Box(modifier = Modifier
+        .fillMaxWidth()
+        .padding(bottom = 8.dp)) {
         CompositeSwitch(position = contentFilter.ordinal, onClick = { idx -> onSetContentFilter(CapturesViewModel.ContentFilter.values()[idx]) }, items = CapturesViewModel.ContentFilter.values().map { it.icon })
     }
 }

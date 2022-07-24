@@ -6,12 +6,14 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Done
+import androidx.compose.material.icons.filled.Error
 import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.Dialog
 import androidx.compose.ui.window.DialogProperties
@@ -46,6 +48,21 @@ fun FullscreenLoadingDialog(
 
 @Composable
 fun FullscreenDoneDialog(
+    onDismissRequest: () -> Unit
+) {
+    FullscreenIconDialog(icon = Icons.Default.Done, onDismissRequest = onDismissRequest)
+}
+
+@Composable
+fun FullscreenErrorDialog(
+    onDismissRequest: () -> Unit
+) {
+    FullscreenIconDialog(icon = Icons.Default.Error, onDismissRequest = onDismissRequest)
+}
+
+@Composable
+private fun FullscreenIconDialog(
+    icon: ImageVector,
     onDismissRequest: () -> Unit,
     properties: DialogProperties = DialogProperties(
         dismissOnBackPress = false,
@@ -68,7 +85,7 @@ fun FullscreenDoneDialog(
                 .padding(32.dp)
         ) {
             Icon(
-                Icons.Default.Done, contentDescription = null, modifier = Modifier
+                icon, contentDescription = null, modifier = Modifier
                     .align(Alignment.Center)
                     .size(56.dp)
             )

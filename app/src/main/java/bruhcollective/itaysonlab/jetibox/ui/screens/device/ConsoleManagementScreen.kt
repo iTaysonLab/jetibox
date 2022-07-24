@@ -37,6 +37,7 @@ import bruhcollective.itaysonlab.jetibox.ui.navigation.LocalNavigationWrapper
 import bruhcollective.itaysonlab.jetibox.ui.shared.FullScreenError
 import bruhcollective.itaysonlab.jetibox.ui.shared.FullScreenLoading
 import bruhcollective.itaysonlab.jetibox.ui.shared.components.FullscreenDoneDialog
+import bruhcollective.itaysonlab.jetibox.ui.shared.components.FullscreenErrorDialog
 import bruhcollective.itaysonlab.jetibox.ui.shared.components.FullscreenLoadingDialog
 import coil.compose.AsyncImage
 import com.squareup.moshi.Moshi
@@ -89,9 +90,7 @@ fun ConsoleManagementScreen(
                 }, modifier = Modifier.statusBarsPadding()
             ) { padding ->
                 Column(Modifier.padding(padding)) {
-                    val firstStorageDevice = remember { state.device.storageDevices.first() }
-
-                    ConsoleStorageHeader(device = firstStorageDevice)
+                    ConsoleStorageHeader(device = state.primaryStorage)
 
                     Surface(
                         tonalElevation = 1.dp, modifier = Modifier
@@ -115,9 +114,7 @@ fun ConsoleManagementScreen(
                                     sizeInBytes = item.sizeInBytes,
                                     linkedDlc = linkedDlc,
                                     onCardClick = { navWrapper.navigate("game/${item.titleId}") },
-                                    onDeleteClick = {
-
-                                    },
+                                    onDeleteClick = { viewModel.deleteApplication(state, item) },
                                     onDlcClick = { viewModel.showDlcs(linkedDlc) },
                                     modifier = Modifier.animateItemPlacement()
                                 )
@@ -167,7 +164,7 @@ class ConsoleManagementViewModel @Inject constructor(
 
             stateList = apps.filter { it.contentType == "Game" }
                 .sortedByDescending { TimeUtils.msDateToUnix(it.lastActiveTime, true) }
-            State.Ready(device = device, apps = apps, titles = titles, dlc = dlcMap)
+            State.Ready(device = device, apps = apps, titles = titles, dlc = dlcMap, primaryStorage = device.storageDevices.first { it.isDefault })
         } catch (e: Exception) {
             e.printStackTrace()
             State.Error(e)
@@ -250,6 +247,54 @@ class ConsoleManagementViewModel @Inject constructor(
         currentDialog = { FullscreenDoneDialog(onDismissRequest = { currentDialog = {} }) }
     }
 
+    fun deleteApplication(state: State.Ready, app: InstalledApp) {
+        currentDialog = {
+            AlertDialog(
+                onDismissRequest = { currentDialog = {} },
+                icon = { Icon(Icons.Default.Delete, contentDescription = null) },
+                title = { Text(stringResource(id = R.string.app_delete_title)) },
+                text = { Text(stringResource(id = R.string.app_delete_text, app.name, state.device.name)) },
+                confirmButton = {
+                    TextButton(onClick = {
+                        viewModelScope.launch { deleteApplicationImpl(state, app) }
+                    }) {
+                        Text(
+                            stringResource(id = R.string.confirm)
+                        )
+                    }
+                },
+                dismissButton = {
+                    TextButton(onClick = { currentDialog = {} }) {
+                        Text(
+                            stringResource(id = R.string.dismiss)
+                        )
+                    }
+                },
+            )
+        }
+    }
+
+    private suspend fun deleteApplicationImpl(state: State.Ready, app: InstalledApp) {
+        currentDialog = { FullscreenLoadingDialog() }
+
+        when (xccsController.deleteApplication(state.device.id, app.instanceId)) {
+            XccsController.ExecutionResult.Success -> {
+                this.state = state.copy(
+                    primaryStorage = state.primaryStorage.copy(freeSpaceBytes = state.primaryStorage.freeSpaceBytes + app.sizeInBytes),
+                    apps = state.apps.filterNot { it.instanceId == app.instanceId }
+                )
+
+                this.stateList = stateList.filterNot { it.instanceId == app.instanceId }
+
+                currentDialog = { FullscreenDoneDialog(onDismissRequest = { currentDialog = {} }) }
+            }
+
+            else -> {
+                currentDialog = { FullscreenErrorDialog(onDismissRequest = { currentDialog = {} }) }
+            }
+        }
+    }
+
     sealed class State {
         class Error(val e: Exception) : State()
         object Loading : State()
@@ -258,7 +303,8 @@ class ConsoleManagementViewModel @Inject constructor(
             val device: Device,
             val apps: List<InstalledApp>,
             val titles: Map<Long, Title>,
-            val dlc: Map<String, List<InstalledApp>>
+            val dlc: Map<String, List<InstalledApp>>,
+            val primaryStorage: StorageDevice
         ) : State()
     }
 }
@@ -314,7 +360,6 @@ private fun InstalledAppCard(
     onDeleteClick: () -> Unit,
     modifier: Modifier
 ) {
-    val navWrapper = LocalNavigationWrapper.current
     val ctx = LocalContext.current
 
     val formattedSize = remember(sizeInBytes) { Formatter.formatFileSize(ctx, sizeInBytes) }

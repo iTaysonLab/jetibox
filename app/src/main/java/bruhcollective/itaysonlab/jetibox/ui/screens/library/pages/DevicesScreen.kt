@@ -24,6 +24,8 @@ import bruhcollective.itaysonlab.jetibox.core.service.XccsService
 import bruhcollective.itaysonlab.jetibox.ui.navigation.LocalNavigationWrapper
 import bruhcollective.itaysonlab.jetibox.ui.shared.FullScreenError
 import bruhcollective.itaysonlab.jetibox.ui.shared.FullScreenLoading
+import com.google.accompanist.swiperefresh.SwipeRefresh
+import com.google.accompanist.swiperefresh.rememberSwipeRefreshState
 import com.squareup.moshi.Moshi
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.launch
@@ -40,13 +42,15 @@ fun DevicesScreen(
         DevicesViewModel.State.Loading -> FullScreenLoading()
         is DevicesViewModel.State.Error -> FullScreenError(state.e)
         is DevicesViewModel.State.Ready -> {
-            LazyColumn(
-                contentPadding = PaddingValues(16.dp),
-                verticalArrangement = Arrangement.spacedBy(8.dp)
-            ) {
-                items(state.devices) { item ->
-                    DeviceCard(item) {
-                        navWrapper.navigate("console/${viewModel.generateUrl(item)}")
+            SwipeRefresh(state = rememberSwipeRefreshState(viewModel.isReloading), onRefresh = { viewModel.reload() }) {
+                LazyColumn(
+                    contentPadding = PaddingValues(16.dp),
+                    verticalArrangement = Arrangement.spacedBy(8.dp)
+                ) {
+                    items(state.devices) { item ->
+                        DeviceCard(item) {
+                            navWrapper.navigate("console/${viewModel.generateUrl(item)}")
+                        }
                     }
                 }
             }
@@ -62,13 +66,28 @@ class DevicesViewModel @Inject constructor(
     var state by mutableStateOf<State>(State.Loading)
         private set
 
+    var isReloading by mutableStateOf(false)
+        private set
+
     init {
         viewModelScope.launch {
-            state = try {
-                State.Ready(xccsService.listDevices().result)
-            } catch (e: Exception) {
-                State.Error(e)
-            }
+            load()
+        }
+    }
+
+    fun reload() {
+        viewModelScope.launch {
+            isReloading = true
+            load()
+            isReloading = false
+        }
+    }
+
+    private suspend fun load() {
+        state = try {
+            State.Ready(xccsService.listDevices().result)
+        } catch (e: Exception) {
+            State.Error(e)
         }
     }
 
