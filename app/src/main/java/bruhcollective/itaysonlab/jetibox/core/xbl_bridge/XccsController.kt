@@ -10,8 +10,10 @@ class XccsController(
 ) {
     private val session = UUID.randomUUID().toString()
 
+    suspend fun consoles() = xccsService.listDevices(queryCurrentDevice = false, includeStorageDevices = true).result
     suspend fun installedApps(consoleId: String) = xccsService.listInstalledApps(consoleId).result
     suspend fun renameConsole(consoleId: String, newName: String) = xccsService.changeConsoleName(consoleId, body = mapOf("name" to newName))
+    suspend fun installedOnAnyDevice(packages: List<String>) = xccsService.listDevicesWithProducts(oneStoreProductIds = packages.joinToString(";")).result.isNotEmpty()
 
     suspend fun deleteApplication(device: String, instance: String) = executeAndWait(device, XccsOperation(
         destination = "Xbox",

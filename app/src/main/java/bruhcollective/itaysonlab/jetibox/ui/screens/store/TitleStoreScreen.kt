@@ -1,10 +1,14 @@
 package bruhcollective.itaysonlab.jetibox.ui.screens.store
 
 import android.text.format.Formatter
+import androidx.compose.animation.core.animateFloatAsState
+import androidx.compose.animation.core.animateIntAsState
+import androidx.compose.animation.core.tween
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.*
@@ -14,6 +18,9 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.draw.drawBehind
+import androidx.compose.ui.geometry.Offset
+import androidx.compose.ui.geometry.Size
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.painter.ColorPainter
@@ -21,16 +28,22 @@ import androidx.compose.ui.input.nestedscroll.nestedScroll
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalDensity
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.ViewModel
+import bruhcollective.itaysonlab.jetibox.R
 import bruhcollective.itaysonlab.jetibox.core.config.MsCapDatabase
 import bruhcollective.itaysonlab.jetibox.core.models.titlehub.*
 import bruhcollective.itaysonlab.jetibox.core.service.TitleHubService
 import bruhcollective.itaysonlab.jetibox.core.util.TimeUtils
+import bruhcollective.itaysonlab.jetibox.core.xbl_bridge.XccsController
 import bruhcollective.itaysonlab.jetibox.ui.navigation.LocalNavigationWrapper
+import bruhcollective.itaysonlab.jetibox.ui.shared.FullScreenError
+import bruhcollective.itaysonlab.jetibox.ui.shared.FullScreenLoading
+import bruhcollective.itaysonlab.jetibox.ui.shared.components.chain.TitleInstallButton
 import bruhcollective.itaysonlab.jetibox.ui.shared.evo.SmallTopAppBar
 import coil.compose.AsyncImage
 import com.google.accompanist.flowlayout.FlowRow
@@ -105,10 +118,11 @@ fun TitleStoreScreen(
                     item {
                         TitleHeader(
                             titleName = data.app.name,
-                            titleBackground = data.app.images?.firstOrNull { it.type == "SuperHeroArt" }?.url,
+                            titleBackground = remember { data.app.images?.firstOrNull { it.type == "SuperHeroArt" }?.url },
                             developer = data.app.detail?.developerName.orEmpty(),
                             publisher = data.app.detail?.publisherName.orEmpty(),
                             genres = data.app.detail?.genres.orEmpty(),
+                            rating = data.contentWarning
                         )
                     }
 
@@ -117,7 +131,10 @@ fun TitleStoreScreen(
                     }
 
                     item {
-                        TitleDescriptionCard(short = data.app.detail?.shortDescription.orEmpty(), long = data.app.detail?.description.orEmpty())
+                        TitleDescriptionCard(
+                            short = data.app.detail?.shortDescription.orEmpty(),
+                            long = data.app.detail?.description.orEmpty()
+                        )
                     }
 
                     if (data.appPersonal.achievement != null) {
@@ -127,7 +144,11 @@ fun TitleStoreScreen(
                     }
 
                     item {
-                        TitleDevicesCard(data.app.devices, data.app.hardware?.maxDownloadSizeInBytes ?: 0L, data.app.detail?.releaseDate.orEmpty())
+                        TitleDevicesCard(
+                            data.app.devices,
+                            data.app.hardware?.maxDownloadSizeInBytes ?: 0L,
+                            data.app.detail?.releaseDate.orEmpty()
+                        )
                     }
 
                     item {
@@ -137,43 +158,43 @@ fun TitleStoreScreen(
             }
         }
 
-        else -> {
-            Box(Modifier.fillMaxSize()) {
-                CircularProgressIndicator(
-                    modifier = Modifier
-                        .align(Alignment.Center)
-                        .size(56.dp)
-                )
-            }
-        }
+        is TitleStoreScreenViewModel.StoreData.Error -> FullScreenError(e = data.e)
+        is TitleStoreScreenViewModel.StoreData.Loading -> FullScreenLoading()
     }
 }
 
 @HiltViewModel
 class TitleStoreScreenViewModel @Inject constructor(
     private val thApi: TitleHubService,
-    private val msCapDatabase: MsCapDatabase
+    private val msCapDatabase: MsCapDatabase,
+    private val xccsController: XccsController
 ) : ViewModel() {
     var content by mutableStateOf<StoreData>(StoreData.Loading)
         private set
 
     suspend fun load(titleId: String) {
-        val app = thApi.storeBatch(
-            fields = "GamePass,ContentBoard,Detail,Hardware,Image,Video,ProductId",
-            body = StoreBatchRequest(titleIds = listOf(titleId))
-        )
+        content = try {
+            val app = thApi.storeBatch(
+                fields = "GamePass,ContentBoard,Detail,Hardware,Image,Video,ProductId",
+                body = StoreBatchRequest(titleIds = listOf(titleId))
+            )
 
-        val achievementInfo = thApi.personalTitleInfo(xuid = app.xuid, titleId = titleId)
+            val achievementInfo = thApi.personalTitleInfo(xuid = app.xuid, titleId = titleId)
 
-        content = StoreData.Loaded(
-            xuid = app.xuid,
-            app = app.titles.first(),
-            appPersonal = achievementInfo.titles.first(),
-            matchedCaps = app.titles.first().detail!!.attributes.mapNotNull {
-                msCapDatabase.mObjPFCaps[it.name]
-                    ?.replace("{0}{1}", " (${it.minimum}-${it.maximum})")
-            }
-        )
+            StoreData.Loaded(
+                xuid = app.xuid,
+                app = app.titles.first(),
+                appPersonal = achievementInfo.titles.first(),
+                matchedCaps = app.titles.first().detail!!.attributes.mapNotNull {
+                    msCapDatabase.mObjPFCaps[it.name]
+                        ?.replace("{0}{1}", " (${it.minimum}-${it.maximum})")
+                },
+                isInstalled = xccsController.installedOnAnyDevice(app.titles.first().productIds!!),
+                contentWarning = TitleContentWarning(app.titles.first().contentBoards ?: emptyList())
+            )
+        } catch (e: Exception) {
+            StoreData.Error(e)
+        }
     }
 
     sealed class StoreData {
@@ -181,10 +202,39 @@ class TitleStoreScreenViewModel @Inject constructor(
             val xuid: String,
             val app: Title,
             val appPersonal: Title,
-            val matchedCaps: List<String>
+            val matchedCaps: List<String>,
+            val isInstalled: Boolean,
+            val contentWarning: TitleContentWarning
         ) : StoreData()
 
+        class Error(val e: Exception): StoreData()
         object Loading : StoreData()
+    }
+
+    inner class TitleContentWarning(
+        ratings: List<TitleContentWarnings>
+    ) {
+        private val matchingRating = ratings
+            .filter { msCapDatabase.mObjRatings.containsKey(it.ratingSystem) }
+            .minBy { msCapDatabase.mObjRatings[it.ratingSystem]?.markets?.firstOrNull()?.priority ?: Int.MAX_VALUE }
+            .let { it to msCapDatabase.mObjRatings[it.ratingSystem]!! }
+
+        private val boardLocalized = matchingRating.second.localizedProperties.first()
+
+        val rating = matchingRating.second.ratings[matchingRating.first.ratingId]!!
+        val ratingLocalized = rating.localized.first()
+
+        val interactiveElements = boardLocalized.interactiveElements.associateBy { it.key }.let { map ->
+            matchingRating.first.interactiveElements.mapNotNull { map[it] }
+        }
+
+        val disclaimers = boardLocalized.descriptors.associateBy { it.key }.let { map ->
+            matchingRating.first.disclaimers.mapNotNull { map[it] }
+        }
+
+        val descriptors = boardLocalized.descriptors.associateBy { it.key }.let { map ->
+            matchingRating.first.descriptors.mapNotNull { map[it] }
+        }
     }
 }
 
@@ -196,7 +246,8 @@ private fun TitleHeader(
     titleBackground: String?,
     developer: String,
     publisher: String,
-    genres: List<String>
+    genres: List<String>,
+    rating: TitleStoreScreenViewModel.TitleContentWarning
 ) {
     val joinedGenres = remember(genres) { genres.joinToString() }
 
@@ -248,16 +299,15 @@ private fun TitleHeader(
                 Text(joinedGenres, color = Color.White.copy(alpha = 0.7f))
             }
 
-            /*Spacer(modifier = Modifier.height(6.dp))
+            Spacer(modifier = Modifier.height(6.dp))
 
-            Button(
-                onClick = { /*TODO*/ }, colors = ButtonDefaults.buttonColors(
-                    containerColor = Color.White.copy(alpha = 0.2f),
-                    contentColor = Color.White
-                )
-            ) {
-                Text("Download")
-            }*/
+            Row(verticalAlignment = Alignment.CenterVertically) {
+                TitleInstallButton(emptyList())
+
+                Spacer(modifier = Modifier.weight(1f))
+
+                TitleRatingButton(rating)
+            }
         }
 
         Box(
@@ -460,9 +510,15 @@ private fun TitleHeaderSmall(
         Column(
             Modifier
                 .padding(start = 16.dp)
-                .align(Alignment.CenterVertically)) {
+                .align(Alignment.CenterVertically)
+        ) {
             Text(text = name, fontSize = 16.sp, maxLines = 1, overflow = TextOverflow.Ellipsis)
-            Text(text = joinedDevs, fontSize = 13.sp, maxLines = 1, overflow = TextOverflow.Ellipsis)
+            Text(
+                text = joinedDevs,
+                fontSize = 13.sp,
+                maxLines = 1,
+                overflow = TextOverflow.Ellipsis
+            )
         }
     }
 }
@@ -506,5 +562,59 @@ private fun TitleDescriptionCard(
                 color = MaterialTheme.colorScheme.primary
             )
         }
+    }
+}
+
+@Composable
+private fun TitleRatingButton(rating: TitleStoreScreenViewModel.TitleContentWarning) {
+    var showAlert by remember { mutableStateOf(false) }
+
+    if (showAlert) {
+        val content = remember(rating) {
+            val string = StringBuilder()
+
+            string.append(rating.descriptors.joinToString { it.descriptor })
+
+            if (rating.interactiveElements.isNotEmpty()) {
+                string.appendLine().appendLine().append(rating.interactiveElements.joinToString { it.interactiveElement })
+            }
+
+            if (rating.disclaimers.isNotEmpty()) {
+                string.appendLine().appendLine().append(rating.disclaimers.joinToString { it.descriptor })
+            }
+
+            string.toString()
+        }
+
+        AlertDialog(
+            onDismissRequest = { showAlert = false },
+            title = { Text(stringResource(id = R.string.alert_content_warnings)) },
+            icon = { Icon(Icons.Default.Warning, contentDescription = null) },
+            text = { Text(content) },
+            confirmButton = {
+                TextButton(onClick = { showAlert = false }) {
+                    Text(stringResource(id = R.string.dismiss))
+                }
+            }
+        )
+    }
+
+    Button(
+        onClick = { showAlert = true }, colors = ButtonDefaults.buttonColors(
+            containerColor = Color.White.copy(alpha = 0.2f),
+            contentColor = Color.White
+        )
+    ) {
+        if (rating.ratingLocalized.logoUrl != null) {
+            AsyncImage(
+                model = rating.ratingLocalized.logoUrl,
+                contentDescription = null,
+                modifier = Modifier.size(24.dp)
+            )
+
+            Spacer(Modifier.width(8.dp))
+        }
+
+        Text(rating.ratingLocalized.longName)
     }
 }

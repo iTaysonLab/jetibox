@@ -18,6 +18,12 @@ class XccsStatus (
 //
 
 @JsonClass(generateAdapter = true)
+class DeviceAndPackages(
+    val device: Device,
+    val packages: List<InstalledApp>
+)
+
+@JsonClass(generateAdapter = true)
 data class Device(
     val id: String,
     val name: String,

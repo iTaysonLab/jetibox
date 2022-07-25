@@ -11,7 +11,14 @@ class RatingBoardsData(
 @JsonClass(generateAdapter = true)
 class RatingBoard(
     @Json(name = "LocalizedProperties") val localizedProperties: List<RatingBoardLocalized>,
-    @Json(name = "Ratings") val ratings: Map<String, Rating>
+    @Json(name = "Ratings") val ratings: Map<String, Rating>,
+    @Json(name = "MarketProperties") val markets: List<RatingBoardMarket>
+)
+
+@JsonClass(generateAdapter = true)
+class RatingBoardMarket(
+    @Json(name = "Priority") val priority: Int,
+    @Json(name = "Market") val market: String,
 )
 
 @JsonClass(generateAdapter = true)

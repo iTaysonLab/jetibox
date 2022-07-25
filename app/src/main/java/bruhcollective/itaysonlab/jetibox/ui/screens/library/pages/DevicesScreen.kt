@@ -21,6 +21,7 @@ import bruhcollective.itaysonlab.jetibox.R
 import bruhcollective.itaysonlab.jetibox.core.models.xccs.Device
 import bruhcollective.itaysonlab.jetibox.core.models.xccs.DevicePowerState
 import bruhcollective.itaysonlab.jetibox.core.service.XccsService
+import bruhcollective.itaysonlab.jetibox.core.xbl_bridge.XccsController
 import bruhcollective.itaysonlab.jetibox.ui.navigation.LocalNavigationWrapper
 import bruhcollective.itaysonlab.jetibox.ui.shared.FullScreenError
 import bruhcollective.itaysonlab.jetibox.ui.shared.FullScreenLoading
@@ -61,7 +62,7 @@ fun DevicesScreen(
 @HiltViewModel
 class DevicesViewModel @Inject constructor(
     private val moshi: Moshi,
-    private val xccsService: XccsService
+    private val xccsController: XccsController
 ) : ViewModel() {
     var state by mutableStateOf<State>(State.Loading)
         private set
@@ -85,7 +86,7 @@ class DevicesViewModel @Inject constructor(
 
     private suspend fun load() {
         state = try {
-            State.Ready(xccsService.listDevices().result)
+            State.Ready(xccsController.consoles())
         } catch (e: Exception) {
             State.Error(e)
         }

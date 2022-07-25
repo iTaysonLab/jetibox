@@ -66,4 +66,6 @@
 
     <string name="app_delete_title">Uninstall?</string>
     <string name="app_delete_text">This will uninstall %s from %s.\n\nYou can reinstall it later at any time.</string>
+
+    <string name="alert_content_warnings">Content warnings</string>
 </resources>

@@ -9,8 +9,15 @@ interface XccsService {
     suspend fun listDevices(
         @Query("queryCurrentDevice") queryCurrentDevice: Boolean = false,
         @Query("includeStorageDevices") includeStorageDevices: Boolean = true,
-        @Query("oneStoreProductIds") oneStoreProductIds: String? = null, // "A;B"
     ): XccsResponse<Device>
+
+    @GET("/lists/devices")
+    @Headers("skillplatform: RemoteManagement", "x-xbl-contract-version: 4")
+    suspend fun listDevicesWithProducts(
+        @Query("queryCurrentDevice") queryCurrentDevice: Boolean = false,
+        @Query("includeStorageDevices") includeStorageDevices: Boolean = true,
+        @Query("oneStoreProductIds") oneStoreProductIds: String, // "A;B"
+    ): XccsResponse<DeviceAndPackages>
 
     @GET("/lists/installedApps")
     @Headers("skillplatform: RemoteManagement", "x-xbl-contract-version: 4")

@@ -24,7 +24,9 @@ data class Title(
     val detail: TitleDetail?,
     val contentBoards: List<TitleContentWarnings>?,
     val pfn: String?,
-    val hardware: TitleHardwareInfo?
+    val hardware: TitleHardwareInfo?,
+    val productId: String?,
+    val productIds: List<String>?
 )
 
 @JsonClass(generateAdapter = true)
