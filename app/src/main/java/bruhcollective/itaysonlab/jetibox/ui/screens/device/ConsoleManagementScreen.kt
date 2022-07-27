@@ -163,7 +163,7 @@ class ConsoleManagementViewModel @Inject constructor(
             }
 
             stateList = apps.filter { it.contentType == "Game" }
-                .sortedByDescending { TimeUtils.msDateToUnix(it.lastActiveTime, true) }
+                .sortedByDescending { TimeUtils.msDateToUnix(it.updateTime ?: it.installTime) }
             State.Ready(device = device, apps = apps, titles = titles, dlc = dlcMap, primaryStorage = device.storageDevices.first { it.isDefault })
         } catch (e: Exception) {
             e.printStackTrace()
