@@ -12,4 +12,10 @@ interface PeopleHubService {
         @Path("xuids") xuids: String,
         @Path("decorations") decorations: String = "detail,preferredColor,presenceDetail,multiplayerSummary"
     ): PeopleHubResponse
+
+    @GET("/users/me/people/social/decoration/{decorations}")
+    @Headers("x-xbl-contract-version: 5")
+    suspend fun getSocial(
+        @Path("decorations") decorations: String = "detail,preferredColor,presenceDetail,multiplayerSummary"
+    ): PeopleHubResponse
 }

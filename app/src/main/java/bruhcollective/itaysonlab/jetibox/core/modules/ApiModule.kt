@@ -39,6 +39,12 @@ object ApiModule {
 
     @Provides
     @Singleton
+    fun provideCollections(
+        @Named("xalRetrofit") retrofit: Retrofit
+    ): CollectionsService = retrofit.create("https://collections.mp.microsoft.com")
+
+    @Provides
+    @Singleton
     fun provideMediaHub(
         @Named("xalRetrofit") retrofit: Retrofit
     ): MediaHubService = retrofit.create("https://mediahub.xboxlive.com")

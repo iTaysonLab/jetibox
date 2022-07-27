@@ -3,8 +3,10 @@ package bruhcollective.itaysonlab.jetibox.core.config
 import bruhcollective.itaysonlab.jetibox.core.ext.debugLog
 import com.tencent.mmkv.MMKV
 import java.util.*
+import javax.inject.Singleton
 import kotlin.reflect.KProperty
 
+@Singleton
 class ConfigService {
     private val instance: MMKV = MMKV.defaultMMKV()
 
@@ -35,10 +37,17 @@ class ConfigService {
     var marketCountry: String by StringCfg("xbl.market", "US")
     var marketLanguage: String by StringCfg("xbl.lang", Locale.getDefault().language)
 
+    var collectionLastUpdate: Long by LongCfg("jba.collectionLastUpdate", 0)
+
     // Abstracts
 
     private inner class StringCfg (private val key: String, private val default: String) {
         operator fun getValue(thisRef: Any?, property: KProperty<*>) = string(key, default)
         operator fun setValue(thisRef: Any?, property: KProperty<*>, value: String) = put(key, value)
+    }
+
+    private inner class LongCfg (private val key: String, private val default: Long) {
+        operator fun getValue(thisRef: Any?, property: KProperty<*>) = long(key, default)
+        operator fun setValue(thisRef: Any?, property: KProperty<*>, value: Long) = put(key, value)
     }
 }

@@ -11,9 +11,12 @@ import com.squareup.moshi.Moshi
 import com.squareup.moshi.adapter
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
+import javax.inject.Inject
+import javax.inject.Singleton
 
 @OptIn(ExperimentalStdlibApi::class)
-class MsCapDatabase(
+@Singleton
+class MsCapDatabase @Inject constructor(
     private val cfgService: ConfigService,
     private val displayCatalogService: DisplayCatalogService,
     private val moshi: Moshi

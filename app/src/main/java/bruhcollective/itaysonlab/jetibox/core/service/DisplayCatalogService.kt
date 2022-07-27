@@ -1,6 +1,7 @@
 package bruhcollective.itaysonlab.jetibox.core.service
 
 import bruhcollective.itaysonlab.jetibox.core.models.displaycatalog.ProductFamiliesData
+import bruhcollective.itaysonlab.jetibox.core.models.displaycatalog.ProductsData
 import bruhcollective.itaysonlab.jetibox.core.models.displaycatalog.RatingBoardsData
 import retrofit2.http.GET
 import retrofit2.http.Query
@@ -17,4 +18,9 @@ interface DisplayCatalogService {
         @Query("market") market: String,
         @Query("languages") languages: String
     ): ProductFamiliesData
+
+    @GET("/v7.0/products")
+    suspend fun getProducts(
+        @Query("bigIds") ids: String
+    ): ProductsData
 }

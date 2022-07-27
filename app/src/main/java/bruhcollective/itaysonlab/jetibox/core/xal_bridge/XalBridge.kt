@@ -5,8 +5,10 @@ import com.microsoft.xalwrapper.models.XalUser
 import kotlinx.coroutines.CancellableContinuation
 import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.suspendCancellableCoroutine
+import javax.inject.Singleton
 import kotlin.coroutines.resume
 
+@Singleton
 class XalBridge {
     var currentProfile: XalUser? = null
         private set

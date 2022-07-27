@@ -2,8 +2,11 @@ package bruhcollective.itaysonlab.jetibox.core.xal_bridge
 
 import bruhcollective.itaysonlab.jetibox.core.config.MsCapDatabase
 import bruhcollective.itaysonlab.jetibox.core.xbl_bridge.XblUserController
+import javax.inject.Inject
+import javax.inject.Singleton
 
-class XalInitController(
+@Singleton
+class XalInitController @Inject constructor(
     private val xalBridge: XalBridge,
     private val xblUserController: XblUserController,
     private val msCapDatabase: MsCapDatabase

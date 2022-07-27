@@ -4,8 +4,11 @@ import bruhcollective.itaysonlab.jetibox.core.models.xccs.XccsOperation
 import bruhcollective.itaysonlab.jetibox.core.service.XccsService
 import kotlinx.coroutines.delay
 import java.util.*
+import javax.inject.Inject
+import javax.inject.Singleton
 
-class XccsController(
+@Singleton
+class XccsController @Inject constructor(
     private val xccsService: XccsService
 ) {
     private val session = UUID.randomUUID().toString()

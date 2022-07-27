@@ -8,9 +8,13 @@ import bruhcollective.itaysonlab.jetibox.core.service.TitleHubService
 import com.squareup.moshi.Moshi
 import com.squareup.moshi.adapter
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.withContext
+import javax.inject.Inject
+import javax.inject.Singleton
 
-class XblTitleDatabase(
+@Singleton
+class XblTitleDatabase @Inject constructor(
     private val database: ConfigService,
     private val moshi: Moshi,
     private val service: TitleHubService
@@ -38,16 +42,33 @@ class XblTitleDatabase(
         val networkFetched = sepTitles.second
             .chunked(100) // 100 is the limit for one fetch operation
             .flatMap { ids ->
-                service.storeBatch(
-                    body = StoreBatchRequest(
-                        pfns = null,
-                        titleIds = ids.map(Long::toString)
-                    )
-                ).titles
+                runWithTries {
+                    service.storeBatch(
+                        body = StoreBatchRequest(
+                            pfns = null,
+                            titleIds = ids.map(Long::toString)
+                        )
+                    ).titles
+                }
             }.onEach { title ->
                 database.put("titles.${title.titleId}", titleAdapter.toJson(title))
             }
 
         return@withContext (localFetched + networkFetched).associateBy { it.modernTitleId }
+    }
+
+    private suspend fun <T> runWithTries(tries: Int = 3, delay: Long = 250, action: suspend () -> T): T {
+        var latestCatchedException: Exception = Exception()
+
+        for (currentTry in 0..tries) {
+            try {
+                return action()
+            } catch (e: Exception) {
+                latestCatchedException = e
+                delay(delay)
+            }
+        }
+
+        throw latestCatchedException
     }
 }
