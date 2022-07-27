@@ -20,6 +20,21 @@
 # hide the original source file name.
 #-renamesourcefileattribute SourceFile
 
+-renamesourcefileattribute
+-repackageclasses
+-allowaccessmodification
+
+-assumenosideeffects class kotlin.jvm.internal.Intrinsics {
+    public static void checkExpressionValueIsNotNull(...);
+    public static void checkNotNullExpressionValue(...);
+    public static void checkReturnedValueIsNotNull(...);
+    public static void checkFieldIsNotNull(...);
+    public static void checkParameterIsNotNull(...);
+}
+
+-dontusemixedcaseclassnames
+-dontwarn kotlin.**
+
 # Don't obfuscate XAL
 -keep class com.microsoft.** {
     *;
@@ -31,4 +46,22 @@
 
 # Rules for BouncyCastle
 -keep class org.bouncycastle.jcajce.provider.** { *; }
--keep class !org.bouncycastle.jce.provider.X509LDAPCertStoreSpi,org.bouncycastle.jce.provider.** { *; }
+-keep class org.bouncycastle.jce.provider.X509LDAPCertStoreSpi,org.bouncycastle.jce.provider.** { *; }
+
+# retrofit
+-keepattributes Signature, InnerClasses, EnclosingMethod
+-keepattributes RuntimeVisibleAnnotations, RuntimeVisibleParameterAnnotations
+-keepattributes AnnotationDefault
+-keepclassmembers,allowshrinking,allowobfuscation interface * {
+    @retrofit2.http.* <methods>;
+}
+-dontwarn org.codehaus.mojo.animal_sniffer.IgnoreJRERequirement
+-dontwarn javax.annotation.**
+-dontwarn kotlin.Unit
+-dontwarn retrofit2.KotlinExtensions
+-dontwarn retrofit2.KotlinExtensions$*
+-if interface * { @retrofit2.http.* <methods>; }
+-keep,allowobfuscation interface <1>
+-keep,allowobfuscation,allowshrinking interface retrofit2.Call
+-keep,allowobfuscation,allowshrinking class retrofit2.Response
+-keep,allowobfuscation,allowshrinking class kotlin.coroutines.Continuation
