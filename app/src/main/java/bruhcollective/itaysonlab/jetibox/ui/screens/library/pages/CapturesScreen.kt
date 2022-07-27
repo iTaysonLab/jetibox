@@ -129,7 +129,7 @@ class CapturesViewModel @Inject constructor(
     }
 
     private fun sort(content: List<MediaHubEntry>) =
-        content.sortedByDescending { TimeUtils.msDateToUnix(it.getDate(), true) }
+        content.sortedByDescending { TimeUtils.msDateToUnix(it.getDate()) }
 
     fun setContentFilterPub(filter: ContentFilter) {
         contentFilter = filter

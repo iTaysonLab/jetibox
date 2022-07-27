@@ -1,26 +1,32 @@
 package bruhcollective.itaysonlab.jetibox.core.util
 
-import java.text.SimpleDateFormat
-import java.util.*
+import kotlinx.datetime.Instant
+import kotlinx.datetime.LocalDateTime
+import kotlinx.datetime.TimeZone
+import kotlinx.datetime.toLocalDateTime
 
 object TimeUtils {
-    private val msFormat = SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss'Z'", Locale.ROOT)
-    private val msFormatWithMs = SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.S'Z'", Locale.ROOT)
+    fun msDateToLocal(timestamp: String, withTime: Boolean = false) = timestamp.asDateTime().let { datetime ->
+        val date = datetime.formatDate(" ")
+        val time = datetime.formatTime(":")
 
-    fun msDateToLocal(src: String?, msTimeWithMs: Boolean = false, withTime: Boolean = false): String {
-        if (src.isNullOrEmpty()) return ""
-        val localFormat = SimpleDateFormat(if (withTime) "HH:mm:ss', 'd MMMM yyyy" else "d MMMM yyyy", Locale.getDefault())
-        return localFormat.format((if (msTimeWithMs) msFormatWithMs else msFormat).parse(src)!!)
+        return@let if (withTime) {
+            "$time, $date"
+        } else {
+            date
+        }
     }
 
-    fun msDateToUnix(src: String?, countMs: Boolean): Long {
-        if (src.isNullOrEmpty()) return 0
-        return (if (countMs) msFormatWithMs else msFormat).parse(src)?.time ?: 0
+    fun msDateToFilename(timestamp: String) = timestamp.asDateTime().let { datetime ->
+        "${datetime.formatDate(".")}_${datetime.formatTime("-")}"
     }
 
-    fun msDateToFilename(src: String?): String {
-        if (src.isNullOrEmpty()) return ""
-        val localFormat = SimpleDateFormat("dd.MM.yyyy'_'HH-mm-ss", Locale.getDefault())
-        return localFormat.format(msFormatWithMs.parse(src)!!)
-    }
+    fun msDateToUnix(timestamp: String) = Instant.parse(timestamp).epochSeconds
+
+    private fun String.asDateTime() = Instant.parse(this).toLocalDateTime(TimeZone.currentSystemDefault())
+
+    private fun LocalDateTime.formatDate(separator: String) = "${date.dayOfMonth.fillUp(2)}${separator}${date.monthNumber.fillUp(2)}${separator}${date.year}"
+    private fun LocalDateTime.formatTime(separator: String) = "${time.hour.fillUp(2)}${separator}${time.minute.fillUp(2)}${separator}${time.second.fillUp(2)}"
+
+    private fun Int.fillUp(digits: Int) = "%0${digits}d".format(this)
 }

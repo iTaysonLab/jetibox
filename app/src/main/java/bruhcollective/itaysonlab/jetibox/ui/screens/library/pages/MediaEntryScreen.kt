@@ -187,7 +187,7 @@ class MediaEntryViewModel @Inject constructor(
                 Property(
                     Icons.Default.DateRange,
                     R.string.media_prop_date,
-                    TimeUtils.msDateToLocal(entry.getDate(), msTimeWithMs = true, withTime = true)
+                    TimeUtils.msDateToLocal(entry.getDate(), withTime = true)
                 )
             )
 
