@@ -3,6 +3,7 @@ package bruhcollective.itaysonlab.jetibox.core.xbl_bridge
 import android.content.Context
 import androidx.room.Room
 import bruhcollective.itaysonlab.jetibox.core.config.ConfigService
+import bruhcollective.itaysonlab.jetibox.core.ext.debugLog
 import bruhcollective.itaysonlab.jetibox.core.models.collections.CollectionItem
 import bruhcollective.itaysonlab.jetibox.core.models.collections.QueryCollectionsBody
 import bruhcollective.itaysonlab.jetibox.core.models.titlehub.Title
@@ -31,7 +32,7 @@ class XblCollectionController @Inject constructor(
 
     private val database = Room.databaseBuilder(context, JBDatabase::class.java, "jb_db").build()
 
-    suspend fun getUserCollection(forceRefresh: Boolean = false): List<Pair<RoomCollectionItem, Title>> {
+    suspend fun getUserCollection(forceRefresh: Boolean = false): List<CollectionItem> {
         return if (forceRefresh || checkDate()) {
             fetchCollectionFromNetwork()
         } else {
@@ -39,14 +40,14 @@ class XblCollectionController @Inject constructor(
         }
     }
 
-    private suspend fun fetchCollectionFromDatabase(): List<Pair<RoomCollectionItem, Title>> {
+    private suspend fun fetchCollectionFromDatabase(): List<CollectionItem> {
         val roomItems = database.collectionDao().getAll()
         val titles = titleDatabase.getTitles(roomItems.map { it.titleId })
-        return roomItems.map { it to titles[it.titleId]!! }
+        return roomItems.mapNotNull { CollectionItem(it to (titles[it.titleId] ?: return@mapNotNull null)) }
     }
 
-    private suspend fun fetchCollectionFromNetwork(): List<Pair<RoomCollectionItem, Title>> {
-        val items = mutableListOf<CollectionItem>()
+    private suspend fun fetchCollectionFromNetwork(): List<CollectionItem> {
+        val items = mutableListOf<bruhcollective.itaysonlab.jetibox.core.models.collections.CollectionItem>()
         var token = ""
 
         while (true) {
@@ -75,22 +76,32 @@ class XblCollectionController @Inject constructor(
 
         // it only begins...
 
-        val products = displayCatalogService.getProducts(items.joinToString(",") { it.productId }).products.associate { it.productId to it.xboxTitleId }
+        val products = displayCatalogService.getProducts(
+            items.joinToString(",") { it.productId },
+            configService.marketCountry,
+            configService.marketLanguage
+        ).products
+            .associate { it.productId to it.xboxTitleId }
+            .filterNot { it.value == 0L }
 
-        val roomItems = items.map { item ->
-            RoomCollectionItem(
-                productId = item.productId,
-                acquiredDate = Instant.parse(item.acquiredDate).epochSeconds,
-                startDate = Instant.parse(item.startDate).epochSeconds,
-                modifiedDate = Instant.parse(item.modifiedDate).epochSeconds,
-                endDate = Instant.parse(item.endDate).epochSeconds,
-                purchasedCountry = item.purchasedCountry,
-                productKind = item.productKind,
-                status = item.status,
-                isTrial = item.isTrial ?: false,
-                trialTimeRemaining = item.trialTimeRemaining ?: "",
-                titleId = products[item.productId]!!
-            )
+        val roomItems = items.mapNotNull { item ->
+            return@mapNotNull if (products.containsKey(item.productId)) {
+                RoomCollectionItem(
+                    productId = item.productId,
+                    acquiredDate = Instant.parse(item.acquiredDate).epochSeconds,
+                    startDate = Instant.parse(item.startDate).epochSeconds,
+                    modifiedDate = Instant.parse(item.modifiedDate).epochSeconds,
+                    endDate = Instant.parse(item.endDate).epochSeconds,
+                    purchasedCountry = item.purchasedCountry ?: "",
+                    productKind = item.productKind,
+                    status = item.status,
+                    isTrial = item.isTrial ?: false,
+                    trialTimeRemaining = item.trialTimeRemaining ?: "",
+                    titleId = products[item.productId]!!
+                )
+            } else {
+                null
+            }
         }
 
         database.collectionDao().insertAll(*roomItems.toTypedArray())
@@ -98,10 +109,16 @@ class XblCollectionController @Inject constructor(
 
         val titles = titleDatabase.getTitles(roomItems.map { it.titleId })
 
-        return roomItems.map { it to titles[it.titleId]!! }
+        return roomItems.mapNotNull { CollectionItem(it to (titles[it.titleId] ?: return@mapNotNull null)) }
     }
 
     private fun checkDate(): Boolean {
         return configService.collectionLastUpdate + REFRESH_RATE.inWholeMilliseconds < Clock.System.now().epochSeconds
+    }
+
+    @JvmInline
+    value class CollectionItem (private val of: Pair<RoomCollectionItem, Title>) {
+        val item get() = of.first
+        val title get() = of.second
     }
 }

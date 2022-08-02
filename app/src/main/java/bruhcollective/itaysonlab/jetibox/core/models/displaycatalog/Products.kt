@@ -13,7 +13,7 @@ class Product(
     @Json(name = "AlternateIds") val alternativeIds: List<AlternativeId>,
     @Json(name = "ProductId") val productId: String
 ) {
-    val xboxTitleId get() = alternativeIds.first { it.idType == "XboxTitleId" }.value.toLong()
+    val xboxTitleId get() = alternativeIds.firstOrNull() { it.idType == "XboxTitleId" }?.value?.toLong() ?: 0L
 }
 
 @JsonClass(generateAdapter = true)

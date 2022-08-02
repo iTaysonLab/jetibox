@@ -25,7 +25,7 @@ import bruhcollective.itaysonlab.jetibox.ui.screens.device.ConsoleManagementScre
 import bruhcollective.itaysonlab.jetibox.ui.screens.home.HomeScreen
 import bruhcollective.itaysonlab.jetibox.ui.screens.landing.LandingScreen
 import bruhcollective.itaysonlab.jetibox.ui.screens.library.LibraryScreen
-import bruhcollective.itaysonlab.jetibox.ui.screens.library.pages.MediaEntryScreen
+import bruhcollective.itaysonlab.jetibox.ui.screens.media.MediaEntryScreen
 import bruhcollective.itaysonlab.jetibox.ui.screens.profile.ProfileScreen
 import bruhcollective.itaysonlab.jetibox.ui.screens.store.TitleStoreScreen
 

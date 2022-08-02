@@ -44,7 +44,7 @@ data class CollectionItem(
     val endDate: String,
     val startDate: String,
     val modifiedDate: String,
-    val purchasedCountry: String,
+    val purchasedCountry: String?,
     val isTrial: Boolean?,
     val trialTimeRemaining: String?
 )

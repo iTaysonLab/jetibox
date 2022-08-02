@@ -21,6 +21,8 @@ interface DisplayCatalogService {
 
     @GET("/v7.0/products")
     suspend fun getProducts(
-        @Query("bigIds") ids: String
+        @Query("bigIds") ids: String,
+        @Query("market") market: String,
+        @Query("languages") languages: String
     ): ProductsData
 }

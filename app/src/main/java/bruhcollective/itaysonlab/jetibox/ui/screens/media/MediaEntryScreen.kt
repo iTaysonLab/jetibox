@@ -1,4 +1,4 @@
-package bruhcollective.itaysonlab.jetibox.ui.screens.library.pages
+package bruhcollective.itaysonlab.jetibox.ui.screens.media
 
 import android.content.Context
 import android.content.Intent
