@@ -2,9 +2,10 @@ package bruhcollective.itaysonlab.jetibox.core.room.models
 
 import androidx.room.ColumnInfo
 import androidx.room.Entity
+import androidx.room.Index
 import androidx.room.PrimaryKey
 
-@Entity(tableName = "collections")
+@Entity(tableName = "collections", indices = [Index(value = ["productId", "title_id"], unique = true)])
 data class RoomCollectionItem(
     @PrimaryKey val productId: String,
     @ColumnInfo(name = "title_id") val titleId: Long,

@@ -56,7 +56,7 @@ fun GamesScreen(
                         )
                     } */
 
-                    items(viewModel.items, key = { it.title.titleId }) { item ->
+                    items(viewModel.items, key = { it.item.productId }) { item ->
                         GameEntry(item.title.displayImage, onClick = {
                             navWrapper.navigate("game/${ item.title.titleId }")
                         })
