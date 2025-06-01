@@ -1,33 +1,58 @@
 package bruhcollective.itaysonlab.jetibox.ui.screens.store
 
 import android.text.format.Formatter
-import androidx.compose.animation.core.animateFloatAsState
-import androidx.compose.animation.core.animateIntAsState
-import androidx.compose.animation.core.tween
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
-import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.offset
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.*
-import androidx.compose.material3.*
-import androidx.compose.runtime.*
+import androidx.compose.material.icons.filled.ArrowBack
+import androidx.compose.material.icons.filled.Computer
+import androidx.compose.material.icons.filled.Gamepad
+import androidx.compose.material.icons.filled.Share
+import androidx.compose.material.icons.filled.Warning
+import androidx.compose.material3.AlertDialog
+import androidx.compose.material3.AssistChip
+import androidx.compose.material3.Button
+import androidx.compose.material3.ButtonDefaults
+import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
+import androidx.compose.material3.LinearProgressIndicator
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Scaffold
+import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
+import androidx.compose.material3.TopAppBar
+import androidx.compose.material3.TopAppBarDefaults
+import androidx.compose.material3.surfaceColorAtElevation
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.draw.clip
-import androidx.compose.ui.draw.drawBehind
-import androidx.compose.ui.geometry.Offset
-import androidx.compose.ui.geometry.Size
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.painter.ColorPainter
 import androidx.compose.ui.input.nestedscroll.nestedScroll
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
-import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
@@ -36,15 +61,17 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.ViewModel
 import bruhcollective.itaysonlab.jetibox.R
 import bruhcollective.itaysonlab.jetibox.core.config.MsCapDatabase
-import bruhcollective.itaysonlab.jetibox.core.models.titlehub.*
+import bruhcollective.itaysonlab.jetibox.core.models.titlehub.StoreBatchRequest
+import bruhcollective.itaysonlab.jetibox.core.models.titlehub.Title
+import bruhcollective.itaysonlab.jetibox.core.models.titlehub.TitleAchievementInfo
+import bruhcollective.itaysonlab.jetibox.core.models.titlehub.TitleContentWarnings
+import bruhcollective.itaysonlab.jetibox.core.models.titlehub.TitleImage
 import bruhcollective.itaysonlab.jetibox.core.service.TitleHubService
-import bruhcollective.itaysonlab.jetibox.core.util.TimeUtils
 import bruhcollective.itaysonlab.jetibox.core.xbl_bridge.XccsController
 import bruhcollective.itaysonlab.jetibox.ui.navigation.LocalNavigationWrapper
 import bruhcollective.itaysonlab.jetibox.ui.shared.FullScreenError
 import bruhcollective.itaysonlab.jetibox.ui.shared.FullScreenLoading
 import bruhcollective.itaysonlab.jetibox.ui.shared.components.chain.TitleInstallButton
-import bruhcollective.itaysonlab.jetibox.ui.shared.evo.SmallTopAppBar
 import coil.compose.AsyncImage
 import com.google.accompanist.flowlayout.FlowRow
 import com.google.accompanist.pager.ExperimentalPagerApi
@@ -52,7 +79,6 @@ import com.google.accompanist.pager.HorizontalPager
 import com.google.accompanist.pager.HorizontalPagerIndicator
 import com.google.accompanist.pager.rememberPagerState
 import dagger.hilt.android.lifecycle.HiltViewModel
-import java.text.SimpleDateFormat
 import javax.inject.Inject
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -62,8 +88,7 @@ fun TitleStoreScreen(
     viewModel: TitleStoreScreenViewModel = hiltViewModel()
 ) {
     val navController = LocalNavigationWrapper.current
-    val topBarState = rememberTopAppBarScrollState()
-    val scrollBehavior = remember { TopAppBarDefaults.pinnedScrollBehavior(topBarState) }
+    val scrollBehavior = TopAppBarDefaults.pinnedScrollBehavior()
 
     LaunchedEffect(Unit) {
         viewModel.load(titleId)
@@ -73,7 +98,7 @@ fun TitleStoreScreen(
         is TitleStoreScreenViewModel.StoreData.Loaded -> {
             Scaffold(
                 topBar = {
-                    SmallTopAppBar(
+                    TopAppBar(
                         title = {
                             TitleHeaderSmall(
                                 data.app.displayImage,
@@ -82,7 +107,7 @@ fun TitleStoreScreen(
                                 data.app.detail?.publisherName.orEmpty(),
                                 Modifier
                                     .fillMaxSize()
-                                    .alpha(scrollBehavior.scrollFraction)
+                                    .alpha(scrollBehavior.state.overlappedFraction)
                             )
                         },
                         navigationIcon = {
@@ -90,7 +115,7 @@ fun TitleStoreScreen(
                                 Icon(Icons.Default.ArrowBack, contentDescription = null)
                             }
                         },
-                        colors = TopAppBarDefaults.smallTopAppBarColors(
+                        colors = TopAppBarDefaults.topAppBarColors(
                             containerColor = Color.Transparent,
                             navigationIconContentColor = Color.White,
                             actionIconContentColor = Color.White,
@@ -105,16 +130,11 @@ fun TitleStoreScreen(
                                 Icon(Icons.Default.Share, contentDescription = null)
                             }
                         },
-                        contentPadding = PaddingValues(top = with(LocalDensity.current) {
-                            WindowInsets.statusBars.getTop(LocalDensity.current).toDp()
-                        }),
                         scrollBehavior = scrollBehavior
                     )
-                }, modifier = Modifier
-                    .fillMaxSize()
-                    .nestedScroll(scrollBehavior.nestedScrollConnection)
+                }
             ) { padding ->
-                LazyColumn {
+                LazyColumn(Modifier.fillMaxSize().nestedScroll(scrollBehavior.nestedScrollConnection)) {
                     item {
                         TitleHeader(
                             titleName = data.app.name,

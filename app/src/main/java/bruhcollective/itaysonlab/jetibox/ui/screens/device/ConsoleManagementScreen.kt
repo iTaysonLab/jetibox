@@ -29,7 +29,6 @@ import bruhcollective.itaysonlab.jetibox.core.models.titlehub.Title
 import bruhcollective.itaysonlab.jetibox.core.models.xccs.Device
 import bruhcollective.itaysonlab.jetibox.core.models.xccs.InstalledApp
 import bruhcollective.itaysonlab.jetibox.core.models.xccs.StorageDevice
-import bruhcollective.itaysonlab.jetibox.core.service.XccsService
 import bruhcollective.itaysonlab.jetibox.core.util.TimeUtils
 import bruhcollective.itaysonlab.jetibox.core.xbl_bridge.XblTitleDatabase
 import bruhcollective.itaysonlab.jetibox.core.xbl_bridge.XccsController
@@ -63,7 +62,7 @@ fun ConsoleManagementScreen(
         is ConsoleManagementViewModel.State.Ready -> {
             Scaffold(
                 topBar = {
-                    SmallTopAppBar(title = {
+                    TopAppBar(title = {
                         Column {
                             Text(
                                 text = state.device.name,
@@ -87,7 +86,7 @@ fun ConsoleManagementScreen(
                             Icon(Icons.Default.Edit, contentDescription = null)
                         }
                     })
-                }, modifier = Modifier.statusBarsPadding()
+                }
             ) { padding ->
                 Column(Modifier.padding(padding)) {
                     ConsoleStorageHeader(device = state.primaryStorage)
@@ -98,14 +97,15 @@ fun ConsoleManagementScreen(
                             .clip(RoundedCornerShape(topStart = 16.dp, topEnd = 16.dp))
                     ) {
                         LazyColumn(contentPadding = PaddingValues(16.dp), verticalArrangement = Arrangement.spacedBy(8.dp)) {
-                            items(viewModel.stateList, key = { it.titleId }) { item ->
+                            items(viewModel.stateList/*, key = { it.titleId }*/) { item ->
                                 val title = remember(item.titleId) { state.titles[item.titleId]!! }
 
                                 val linkedDlc = remember(item.legacyProductId) {
-                                    state.dlc.getOrDefault(
-                                        item.legacyProductId,
+                                    state.dlc.getOrElse(
+                                        item.legacyProductId.orEmpty(),
+                                    ) {
                                         emptyList()
-                                    )
+                                    }
                                 }
 
                                 InstalledAppCard(
@@ -116,7 +116,7 @@ fun ConsoleManagementScreen(
                                     onCardClick = { navWrapper.navigate("game/${item.titleId}") },
                                     onDeleteClick = { viewModel.deleteApplication(state, item) },
                                     onDlcClick = { viewModel.showDlcs(linkedDlc) },
-                                    modifier = Modifier.animateItemPlacement()
+                                    modifier = Modifier.animateItem()
                                 )
                             }
                         }

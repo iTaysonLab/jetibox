@@ -1,16 +1,19 @@
 package bruhcollective.itaysonlab.jetibox.core.xbl_bridge
 
+import androidx.compose.material3.ColorScheme
 import androidx.compose.material3.darkColorScheme
 import androidx.compose.material3.lightColorScheme
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
+import androidx.compose.ui.graphics.Color
 import androidx.core.graphics.toColorInt
 import bruhcollective.itaysonlab.jetibox.core.config.ConfigService
 import bruhcollective.itaysonlab.jetibox.core.models.peoplehub.XblPerson
 import bruhcollective.itaysonlab.jetibox.core.service.PeopleHubService
 import bruhcollective.itaysonlab.jetibox.core.xal_bridge.XalBridge
-import bruhcollective.itaysonlab.jetibox.ui.monet.ColorToScheme
+import com.materialkolor.ktx.DynamicScheme
+import com.materialkolor.toColorScheme
 import javax.inject.Inject
 import javax.inject.Singleton
 
@@ -57,7 +60,7 @@ class XblUserController @Inject constructor(
         xblCurrentUserAvailable = true
     }
 
-    suspend fun tryRestoring() {
+    fun tryRestoring() {
         if (configService.userColor.isNotEmpty()) {
             xblCurrentUserTheme = generatePairOf("#${configService.userColor}".toColorInt())
         }
@@ -70,5 +73,12 @@ class XblUserController @Inject constructor(
         xblCurrentUserPreferredColor = 0
     }
 
-    private suspend fun generatePairOf(color: Int) = ColorToScheme.convert(color, false) to ColorToScheme.convert(color, true)
+    private fun generatePairOf(color: Int): Pair<ColorScheme, ColorScheme> {
+        return Color(color).let { composeColor ->
+            val lightDs = DynamicScheme(seedColor = composeColor, isDark = false)
+            val darkDs = DynamicScheme(seedColor = composeColor, isDark = true)
+
+            lightDs.toColorScheme() to darkDs.toColorScheme()
+        }
+    }
 }

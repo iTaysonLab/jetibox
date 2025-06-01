@@ -2,6 +2,8 @@ package bruhcollective.itaysonlab.jetibox.core.xal_bridge
 
 import bruhcollective.itaysonlab.jetibox.core.config.MsCapDatabase
 import bruhcollective.itaysonlab.jetibox.core.xbl_bridge.XblUserController
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.withContext
 import javax.inject.Inject
 import javax.inject.Singleton
 
@@ -11,13 +13,19 @@ class XalInitController @Inject constructor(
     private val xblUserController: XblUserController,
     private val msCapDatabase: MsCapDatabase
 ) {
-    suspend fun init(): Boolean = if (xalBridge.initialized) {
-        xalBridge.currentProfile != null
-    } else {
-        xblUserController.tryRestoring()
-        xalBridge.initialize()
-        (xalBridge.tryUsingSavedData() is XalBridge.XalBridgeSemaphore.Success).also {
-            if (it) { onSignIn() }
+    suspend fun init(): Boolean {
+        if (xalBridge.initialized) {
+            return xalBridge.currentProfile != null
+        } else {
+            return withContext(Dispatchers.Default) {
+                xblUserController.tryRestoring()
+                xalBridge.initialize()
+                return@withContext (xalBridge.tryUsingSavedData() is XalBridge.XalBridgeSemaphore.Success).also { success ->
+                    if (success) {
+                        onSignIn()
+                    }
+                }
+            }
         }
     }
 

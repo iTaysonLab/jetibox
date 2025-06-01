@@ -3,6 +3,7 @@ package bruhcollective.itaysonlab.jetibox
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
+import androidx.activity.enableEdgeToEdge
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.CircleShape
@@ -14,6 +15,8 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.core.view.WindowCompat
+import androidx.navigation.NavDestination.Companion.hasRoute
+import androidx.navigation.NavDestination.Companion.hierarchy
 import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
 import bruhcollective.itaysonlab.jetibox.core.xal_bridge.XalInitController
@@ -42,14 +45,12 @@ class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
-        WindowCompat.setDecorFitsSystemWindows(window, false)
-
+        enableEdgeToEdge()
         setContent {
             val bottomSheetNavigator = rememberBottomSheetNavigator()
             val navController = rememberNavController(bottomSheetNavigator)
             val navBackStackEntry by navController.currentBackStackEntryAsState()
             val lambdaNavController = NavigationWrapper { navController }
-            val navBarHeightDp = WindowInsets.navigationBars.asPaddingValues().calculateBottomPadding()
 
             JetiboxTheme(
                 xblUserController = xblUserController,
@@ -60,10 +61,9 @@ class MainActivity : ComponentActivity() {
                         bottomBar = {
                             val currentDestination = navBackStackEntry?.destination
                             if (Screen.hideNavigationBar.any { it == currentDestination?.route }) return@Scaffold
-                            bruhcollective.itaysonlab.jetibox.ui.shared.evo.NavigationBar(
-                                modifier = Modifier
-                                    .background(MaterialTheme.colorScheme.surfaceColorAtElevation(3.dp)),
-                                contentPadding = PaddingValues(bottom = navBarHeightDp)
+
+                            NavigationBar(
+                                modifier = Modifier.background(MaterialTheme.colorScheme.surfaceColorAtElevation(3.dp)),
                             ) {
                                 Screen.showInBottomNavigation.forEach { (screen, icon) ->
                                     NavigationBarItem(
@@ -92,11 +92,9 @@ class MainActivity : ComponentActivity() {
                                                 }
                                             )
                                         },
-                                        selected = lambdaNavController.controller().backQueue.any {
-                                            it.destination.route?.startsWith(
-                                                screen.route
-                                            ) == true
-                                        },
+                                        selected = currentDestination?.hierarchy?.any {
+                                            it.hasRoute(route = screen.route, null)
+                                        } == true,
                                         onClick = {
                                             navController.navigate(screen.route) {
                                                 popUpTo(Screen.NavGraph.route) {
@@ -110,7 +108,7 @@ class MainActivity : ComponentActivity() {
                                     )
                                 }
                             }
-                        }
+                        }, contentWindowInsets = WindowInsets(0.dp)
                     ) { innerPadding ->
                         AppNavigation(
                             navController = navController,

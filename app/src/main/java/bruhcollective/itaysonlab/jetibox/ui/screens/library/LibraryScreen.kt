@@ -1,8 +1,12 @@
 package bruhcollective.itaysonlab.jetibox.ui.screens.library
 
+import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.statusBarsPadding
+import androidx.compose.foundation.pager.HorizontalPager
+import androidx.compose.foundation.pager.PagerState
+import androidx.compose.foundation.pager.rememberPagerState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.TabPosition
 import androidx.compose.material3.ExperimentalMaterial3Api
@@ -24,16 +28,14 @@ import androidx.compose.ui.unit.lerp
 import bruhcollective.itaysonlab.jetibox.ui.screens.library.pages.CapturesScreen
 import bruhcollective.itaysonlab.jetibox.ui.screens.library.pages.DevicesScreen
 import bruhcollective.itaysonlab.jetibox.ui.screens.library.pages.GamesScreen
-import com.google.accompanist.pager.*
 import kotlinx.coroutines.launch
 
-@OptIn(ExperimentalMaterial3Api::class, ExperimentalPagerApi::class)
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun LibraryScreen(
 
 ) {
     val coroutineScope = rememberCoroutineScope()
-    val pagerState = rememberPagerState()
 
     val pages = remember {
         listOf(
@@ -57,6 +59,8 @@ fun LibraryScreen(
             )
         )
     }
+
+    val pagerState = rememberPagerState { pages.size }
 
     Scaffold(
         topBar = {
@@ -84,12 +88,11 @@ fun LibraryScreen(
                     )
                 }
             }
-        }
+        }, contentWindowInsets = WindowInsets(0.dp)
     ) { padding ->
         HorizontalPager(
-            count = pages.size,
             state = pagerState,
-            modifier = Modifier.padding(padding)
+            modifier = Modifier.padding(padding),
         ) { page ->
             Surface(
                 tonalElevation = 1.dp,
@@ -109,7 +112,6 @@ private class LibrarySubpage(
 
 //
 
-@ExperimentalPagerApi
 private fun Modifier.pagerTabIndicatorOffset(
     pagerState: PagerState,
     tabPositions: List<TabPosition>,
@@ -123,7 +125,7 @@ private fun Modifier.pagerTabIndicatorOffset(
         val currentTab = tabPositions[currentPage]
         val previousTab = tabPositions.getOrNull(currentPage - 1)
         val nextTab = tabPositions.getOrNull(currentPage + 1)
-        val fraction = pagerState.currentPageOffset
+        val fraction = pagerState.currentPageOffsetFraction
         val indicatorWidth = if (fraction > 0 && nextTab != null) {
             lerp(currentTab.width, nextTab.width, fraction).roundToPx()
         } else if (fraction < 0 && previousTab != null) {

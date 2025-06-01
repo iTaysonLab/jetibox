@@ -1,22 +1,30 @@
 package bruhcollective.itaysonlab.jetibox.ui.screens.home
 
-import androidx.compose.foundation.layout.*
-import androidx.compose.material3.*
-import androidx.compose.runtime.*
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.size
+import androidx.compose.material3.CircularProgressIndicator
+import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Scaffold
+import androidx.compose.material3.TopAppBar
+import androidx.compose.material3.TopAppBarDefaults
+import androidx.compose.material3.surfaceColorAtElevation
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.input.nestedscroll.nestedScroll
-import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import bruhcollective.itaysonlab.jetibox.core.models.contentbuilder.*
-import bruhcollective.itaysonlab.jetibox.core.service.ContentBuilderService
-import bruhcollective.itaysonlab.jetibox.core.service.TitleHubService
 import bruhcollective.itaysonlab.jetibox.core.ext.extractTitlesFromCBLayout
-import bruhcollective.itaysonlab.jetibox.core.xal_bridge.XalBridge
+import bruhcollective.itaysonlab.jetibox.core.models.contentbuilder.ContentBuilderResponse
+import bruhcollective.itaysonlab.jetibox.core.service.ContentBuilderService
 import bruhcollective.itaysonlab.jetibox.core.xbl_bridge.XblTitleDatabase
 import bruhcollective.itaysonlab.jetibox.ui.screens.home.render.HomeLayoutRender
 import bruhcollective.itaysonlab.jetibox.ui.screens.home.render.LayoutStorage
@@ -29,33 +37,29 @@ import javax.inject.Inject
 fun HomeScreen(
     viewModel: HomeScreenViewModel = hiltViewModel()
 ) {
-    val topBarState = rememberTopAppBarScrollState()
-    val scrollBehavior = remember { TopAppBarDefaults.pinnedScrollBehavior(topBarState) }
+    val scrollBehavior = TopAppBarDefaults.pinnedScrollBehavior()
 
     if (viewModel.baseLayout != null) {
         Scaffold(
             topBar = {
-                bruhcollective.itaysonlab.jetibox.ui.shared.evo.SmallTopAppBar(
+                TopAppBar(
                     title = {},
-                    colors = TopAppBarDefaults.smallTopAppBarColors(
+                    colors = TopAppBarDefaults.topAppBarColors(
                         containerColor = Color.Transparent,
                         scrolledContainerColor = MaterialTheme.colorScheme.surfaceColorAtElevation(
                             3.dp
                         )
                     ),
-                    contentPadding = PaddingValues(top = with(LocalDensity.current) {
-                        WindowInsets.statusBars.getTop(LocalDensity.current).toDp()
-                    }),
                     scrollBehavior = scrollBehavior
                 )
-            }, modifier = Modifier
-                .fillMaxSize()
-                .nestedScroll(scrollBehavior.nestedScrollConnection)
+            }
         ) { padding ->
             HomeLayoutRender(
                 data = viewModel.baseLayout!!.layout,
                 storage = viewModel.storage,
-                modifier = Modifier.fillMaxHeight()
+                modifier = Modifier
+                    .fillMaxSize()
+                    .nestedScroll(scrollBehavior.nestedScrollConnection)
             )
         }
     } else {

@@ -6,16 +6,53 @@ import android.net.Uri
 import android.provider.Settings
 import android.text.format.Formatter
 import androidx.compose.foundation.clickable
-import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.heightIn
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.*
-import androidx.compose.material3.*
-import androidx.compose.runtime.*
+import androidx.compose.material.icons.filled.ArrowBack
+import androidx.compose.material.icons.filled.AspectRatio
+import androidx.compose.material.icons.filled.DateRange
+import androidx.compose.material.icons.filled.Done
+import androidx.compose.material.icons.filled.Error
+import androidx.compose.material.icons.filled.FileDownload
+import androidx.compose.material.icons.filled.HdrOn
+import androidx.compose.material.icons.filled.Save
+import androidx.compose.material.icons.filled.ShutterSpeed
+import androidx.compose.material.icons.filled.Timer
+import androidx.compose.material.icons.filled.Warning
+import androidx.compose.material.icons.filled._30fps
+import androidx.compose.material.icons.filled._60fps
+import androidx.compose.material3.AlertDialog
+import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
+import androidx.compose.material3.LinearProgressIndicator
+import androidx.compose.material3.ListItem
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Scaffold
+import androidx.compose.material3.Surface
+import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
+import androidx.compose.material3.TopAppBar
+import androidx.compose.material3.surfaceColorAtElevation
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -34,7 +71,6 @@ import androidx.lifecycle.viewModelScope
 import bruhcollective.itaysonlab.jetibox.R
 import bruhcollective.itaysonlab.jetibox.core.models.mediahub.ContentLocator
 import bruhcollective.itaysonlab.jetibox.core.models.mediahub.Gameclip
-import bruhcollective.itaysonlab.jetibox.core.models.mediahub.MediaHubEntry
 import bruhcollective.itaysonlab.jetibox.core.models.mediahub.Screenshot
 import bruhcollective.itaysonlab.jetibox.core.models.titlehub.Title
 import bruhcollective.itaysonlab.jetibox.core.util.GalleryUtils
@@ -66,7 +102,7 @@ fun MediaEntryScreen(
         is MediaEntryViewModel.State.Ready -> {
             Scaffold(
                 topBar = {
-                    SmallTopAppBar(title = {
+                    TopAppBar(title = {
                         HeaderSmall(
                             image = state.title.displayImage,
                             title = stringResource(id = if (isGameclip) R.string.gameclip else R.string.screenshot),
@@ -77,7 +113,7 @@ fun MediaEntryScreen(
                             Icon(Icons.Default.ArrowBack, contentDescription = null)
                         }
                     })
-                }, modifier = Modifier.statusBarsPadding()
+                }
             ) { padding ->
                 Surface(
                     tonalElevation = 1.dp, modifier = Modifier
@@ -98,7 +134,7 @@ fun MediaEntryScreen(
                             ListItem(
                                 leadingContent = {
                                     Icon(item.icon, contentDescription = null)
-                                }, headlineText = {
+                                }, headlineContent = {
                                     Text(stringResource(id = item.title))
                                 }, modifier = Modifier.clickable {
                                     item.action()
@@ -114,9 +150,9 @@ fun MediaEntryScreen(
                             ListItem(
                                 leadingContent = {
                                     Icon(item.icon, contentDescription = null)
-                                }, headlineText = {
+                                }, headlineContent = {
                                     Text(stringResource(id = item.title))
-                                }, supportingText = {
+                                }, supportingContent = {
                                     Text(item.subtitle)
                                 }
                             )

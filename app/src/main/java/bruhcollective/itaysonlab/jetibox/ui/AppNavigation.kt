@@ -16,6 +16,8 @@ import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.dialog
+import androidx.navigation.navDeepLink
+import androidx.navigation.toRoute
 import bruhcollective.itaysonlab.jetibox.R
 import bruhcollective.itaysonlab.jetibox.core.xal_bridge.XalInitController
 import bruhcollective.itaysonlab.jetibox.ui.navigation.LocalNavigationWrapper
@@ -28,6 +30,7 @@ import bruhcollective.itaysonlab.jetibox.ui.screens.library.LibraryScreen
 import bruhcollective.itaysonlab.jetibox.ui.screens.media.MediaEntryScreen
 import bruhcollective.itaysonlab.jetibox.ui.screens.profile.ProfileScreen
 import bruhcollective.itaysonlab.jetibox.ui.screens.store.TitleStoreScreen
+import kotlinx.serialization.Serializable
 
 @Composable
 fun AppNavigation(
@@ -67,8 +70,18 @@ fun AppNavigation(
       HomeScreen()
     }
 
-    composable(Screen.GameDetail.route) {
+    composable(
+      route = Screen.GameDetail.route,
+    ) {
       TitleStoreScreen(it.arguments!!.getString("id")!!)
+    }
+
+    composable<GameDetailDeeplink>(
+      deepLinks = listOf(
+        navDeepLink<GameDetailDeeplink>(basePath = "xbox://games")
+      )
+    ) { backStackEntry ->
+      TitleStoreScreen(backStackEntry.toRoute<GameDetailDeeplink>().titleId)
     }
 
     composable(Screen.Library.route) {
@@ -115,3 +128,8 @@ fun AppNavigation(
     }
   }
 }
+
+@Serializable
+data class GameDetailDeeplink (
+  val titleId: String
+)

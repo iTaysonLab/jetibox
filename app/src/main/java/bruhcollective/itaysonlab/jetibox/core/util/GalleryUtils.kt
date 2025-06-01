@@ -10,7 +10,7 @@ import android.provider.MediaStore
 import android.text.format.Formatter
 import androidx.annotation.FloatRange
 import androidx.annotation.RequiresApi
-import com.markodevcic.peko.Peko
+import com.markodevcic.peko.PermissionRequester
 import com.markodevcic.peko.PermissionResult
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.*
@@ -29,10 +29,10 @@ object GalleryUtils {
         video: Boolean,
         hdr: Boolean,
     ): Flow<SaveToGalleryState> = flow {
-        if (Peko.requestPermissionsAsync(
-                ctx,
+        if (
+            PermissionRequester.instance().request(
                 Manifest.permission.WRITE_EXTERNAL_STORAGE
-            ) !is PermissionResult.Granted
+            ).first() !is PermissionResult.Granted
         ) {
             emit(SaveToGalleryState.PermissionsRequired)
             return@flow
