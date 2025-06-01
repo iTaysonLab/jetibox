@@ -1,60 +1,60 @@
 package bruhcollective.itaysonlab.jetibox.core.models.displaycatalog
 
-import com.squareup.moshi.Json
-import com.squareup.moshi.JsonClass
+import kotlinx.serialization.SerialName
+import kotlinx.serialization.Serializable
 
-@JsonClass(generateAdapter = true)
+@Serializable
 class RatingBoardsData(
-    @Json(name = "RatingBoards") val ratingBoards: Map<String, RatingBoard>
+    @SerialName(value = "RatingBoards") val ratingBoards: Map<String, RatingBoard>
 )
 
-@JsonClass(generateAdapter = true)
+@Serializable
 class RatingBoard(
-    @Json(name = "LocalizedProperties") val localizedProperties: List<RatingBoardLocalized>,
-    @Json(name = "Ratings") val ratings: Map<String, Rating>,
-    @Json(name = "MarketProperties") val markets: List<RatingBoardMarket>
+    @SerialName(value = "LocalizedProperties") val localizedProperties: List<RatingBoardLocalized> = emptyList(),
+    @SerialName(value = "Ratings") val ratings: Map<String, Rating>,
+    @SerialName(value = "MarketProperties") val markets: List<RatingBoardMarket> = emptyList()
 )
 
-@JsonClass(generateAdapter = true)
+@Serializable
 class RatingBoardMarket(
-    @Json(name = "Priority") val priority: Int,
-    @Json(name = "Market") val market: String,
+    @SerialName(value = "Priority") val priority: Int,
+    @SerialName(value = "Market") val market: String,
 )
 
-@JsonClass(generateAdapter = true)
+@Serializable
 class Rating(
-    @Json(name = "Name") val name: String,
-    @Json(name = "Age") val age: Int,
-    @Json(name = "LocalizedProperties") val localized: List<RatingLocalized>
+    @SerialName(value = "Name") val name: String,
+    @SerialName(value = "Age") val age: Int,
+    @SerialName(value = "LocalizedProperties") val localized: List<RatingLocalized> = emptyList()
 )
 
-@JsonClass(generateAdapter = true)
+@Serializable
 class RatingLocalized(
-    @Json(name = "ShortName") val shortName: String,
-    @Json(name = "LongName") val longName: String,
-    @Json(name = "Description") val description: String,
-    @Json(name = "LogoUrl") val logoUrl: String?,
+    @SerialName(value = "ShortName") val shortName: String,
+    @SerialName(value = "LongName") val longName: String,
+    @SerialName(value = "Description") val description: String,
+    @SerialName(value = "LogoUrl") val logoUrl: String? = null,
 )
 
-@JsonClass(generateAdapter = true)
+@Serializable
 class RatingBoardLocalized(
-    @Json(name = "ShortName") val shortName: String,
-    @Json(name = "LongName") val longName: String,
-    @Json(name = "Url") val url: String,
-    @Json(name = "Descriptors") val descriptors: List<RatingDescriptor>,
-    @Json(name = "InteractiveElements") val interactiveElements: List<RatingInteractiveElement>,
+    @SerialName(value = "ShortName") val shortName: String,
+    @SerialName(value = "LongName") val longName: String,
+    @SerialName(value = "Url") val url: String,
+    @SerialName(value = "Descriptors") val descriptors: List<RatingDescriptor> = emptyList(),
+    @SerialName(value = "InteractiveElements") val interactiveElements: List<RatingInteractiveElement> = emptyList(),
 )
 
-@JsonClass(generateAdapter = true)
+@Serializable
 class RatingDescriptor(
-    @Json(name = "Key") val key: String,
-    @Json(name = "Descriptor") val descriptor: String,
-    @Json(name = "LogoUrl") val logoUrl: String?
+    @SerialName(value = "Key") val key: String,
+    @SerialName(value = "Descriptor") val descriptor: String,
+    @SerialName(value = "LogoUrl") val logoUrl: String? = null
 )
 
-@JsonClass(generateAdapter = true)
+@Serializable
 class RatingInteractiveElement(
-    @Json(name = "Key") val key: String,
-    @Json(name = "InteractiveElement") val interactiveElement: String,
-    @Json(name = "LogoUrl") val logoUrl: String?
+    @SerialName(value = "Key") val key: String,
+    @SerialName(value = "InteractiveElement") val interactiveElement: String,
+    @SerialName(value = "LogoUrl") val logoUrl: String? = null
 )

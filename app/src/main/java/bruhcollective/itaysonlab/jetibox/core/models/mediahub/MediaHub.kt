@@ -1,17 +1,21 @@
 package bruhcollective.itaysonlab.jetibox.core.models.mediahub
 
+import bruhcollective.itaysonlab.jetibox.core.models.contentbuilder.ContentBuilderLayer
 import bruhcollective.itaysonlab.jetibox.core.util.TimeUtils
-import com.squareup.moshi.JsonClass
-import dev.zacsweers.moshix.sealed.annotations.DefaultObject
-import dev.zacsweers.moshix.sealed.annotations.TypeLabel
+import kotlinx.serialization.ExperimentalSerializationApi
+import kotlinx.serialization.SerialName
+import kotlinx.serialization.Serializable
+import kotlinx.serialization.json.JsonClassDiscriminator
+import kotlinx.serialization.modules.SerializersModule
+import kotlinx.serialization.modules.polymorphic
 
-@JsonClass(generateAdapter = true)
+@Serializable
 class MediaHubSearchResponse<T: MediaHubEntry>(
-    val values: List<T>,
-    val continuationToken: String?
+    val values: List<T> = emptyList(),
+    val continuationToken: String? = null
 )
 
-@JsonClass(generateAdapter = true)
+@Serializable
 class Screenshot(
     val contentId: String,
     val captureDate: String,
@@ -21,7 +25,7 @@ class Screenshot(
     val resolutionWidth: Int,
     val resolutionHeight: Int,
     val ownerXuid: Long,
-    val contentLocators: List<ContentLocator>,
+    val contentLocators: List<ContentLocator> = emptyList(),
     val commentCount: Int,
     val likeCount: Int,
     val shareCount: Int,
@@ -36,7 +40,7 @@ class Screenshot(
     override fun formatFilename() = "${titleName}_${TimeUtils.msDateToFilename(dateUploaded)}"
 }
 
-@JsonClass(generateAdapter = true)
+@Serializable
 class Gameclip(
     val contentId: String,
     val uploadDate: String,
@@ -49,7 +53,7 @@ class Gameclip(
     val titleId: Long,
     val titleName: String,
     val ownerXuid: Long,
-    val contentLocators: List<ContentLocator>,
+    val contentLocators: List<ContentLocator> = emptyList(),
     val commentCount: Int,
     val likeCount: Int,
     val shareCount: Int,
@@ -64,36 +68,46 @@ class Gameclip(
     override fun formatFilename() = "${titleName}_${TimeUtils.msDateToFilename(uploadDate)}"
 }
 
-@JsonClass(generateAdapter = true, generator = "sealed:locatorType")
+@OptIn(ExperimentalSerializationApi::class)
+@Serializable
+@JsonClassDiscriminator("locatorType")
 sealed class ContentLocator {
+    companion object {
+        val serializerModule = SerializersModule {
+            polymorphic(ContentLocator::class) {
+                defaultDeserializer { Unknown.serializer() }
+            }
+        }
+    }
+
     abstract val uri: String
 
-    @TypeLabel("Download")
-    @JsonClass(generateAdapter = true)
+    @SerialName("Download")
+    @Serializable
     class Download(
         override val uri: String, val fileSize: Long
     ): ContentLocator()
 
-    @TypeLabel("Download_HDR")
-    @JsonClass(generateAdapter = true)
+    @SerialName("Download_HDR")
+    @Serializable
     class DownloadHDR(
         override val uri: String, val fileSize: Long
     ): ContentLocator()
 
-    @TypeLabel("Thumbnail_Small")
-    @JsonClass(generateAdapter = true)
+    @SerialName("Thumbnail_Small")
+    @Serializable
     class SmallThumbnail(
         override val uri: String
     ): ContentLocator()
 
-    @TypeLabel("Thumbnail_Large")
-    @JsonClass(generateAdapter = true)
+    @SerialName("Thumbnail_Large")
+    @Serializable
     class LargeThumbnail(
         override val uri: String
     ): ContentLocator()
 
-    @DefaultObject
-    object Unknown: ContentLocator() {
+    @Serializable
+    data object Unknown: ContentLocator() {
         override val uri = ""
     }
 }
@@ -102,7 +116,7 @@ interface MediaHubEntry {
     fun getEntryId(): String
     fun getDate(): String
     fun getGameId(): Long
-    fun getLocators(): List<ContentLocator>
+    fun getLocators(): List<ContentLocator> = emptyList()
 
     fun formatResolution(): String
     fun formatFilename(): String

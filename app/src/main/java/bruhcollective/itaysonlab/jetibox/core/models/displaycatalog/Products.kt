@@ -1,23 +1,23 @@
 package bruhcollective.itaysonlab.jetibox.core.models.displaycatalog
 
-import com.squareup.moshi.Json
-import com.squareup.moshi.JsonClass
+import kotlinx.serialization.SerialName
+import kotlinx.serialization.Serializable
 
-@JsonClass(generateAdapter = true)
+@Serializable
 class ProductsData(
-    @Json(name = "Products") val products: List<Product>
+    @SerialName(value = "Products") val products: List<Product> = emptyList()
 )
 
-@JsonClass(generateAdapter = true)
+@Serializable
 class Product(
-    @Json(name = "AlternateIds") val alternativeIds: List<AlternativeId>,
-    @Json(name = "ProductId") val productId: String
+    @SerialName(value = "AlternateIds") val alternativeIds: List<AlternativeId> = emptyList(),
+    @SerialName(value = "ProductId") val productId: String
 ) {
     val xboxTitleId get() = alternativeIds.firstOrNull() { it.idType == "XboxTitleId" }?.value?.toLong() ?: 0L
 }
 
-@JsonClass(generateAdapter = true)
+@Serializable
 class AlternativeId(
-    @Json(name = "Value") val value: String,
-    @Json(name = "IdType") val idType: String
+    @SerialName(value = "Value") val value: String,
+    @SerialName(value = "IdType") val idType: String
 )

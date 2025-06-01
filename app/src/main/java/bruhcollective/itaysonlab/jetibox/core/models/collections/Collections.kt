@@ -1,10 +1,10 @@
 package bruhcollective.itaysonlab.jetibox.core.models.collections
 
-import com.squareup.moshi.JsonClass
+import kotlinx.serialization.Serializable
 
-@JsonClass(generateAdapter = true)
+@Serializable
 class QueryCollectionsBody(
-    val beneficiaries: List<String>,
+    val beneficiaries: List<String> = emptyList(),
     val market: String,
     val includeDuplicates: Boolean,
     val checkSatisfyingEntitlements: Boolean,
@@ -12,18 +12,18 @@ class QueryCollectionsBody(
     val showSatisfiedBy: Boolean,
     val maxPageSize: Long, // 1000
     val validityType: String, // ValidAndFuture
-    val entitlementFilters: List<String>, // *:Game
-    val productSkuIds: List<ProductSkuId>,
+    val entitlementFilters: List<String> = emptyList(), // *:Game
+    val productSkuIds: List<ProductSkuId> = emptyList(),
     val continuationToken: String
 )
 
-@JsonClass(generateAdapter = true)
+@Serializable
 class QueryCollectionResponse(
-    val continuationToken: String?,
-    val items: List<CollectionItem>
+    val continuationToken: String? = null,
+    val items: List<CollectionItem> = emptyList()
 )
 
-@JsonClass(generateAdapter = true)
+@Serializable
 class ProductSkuId(
     val productId: String,
     val skuId: String? = null
@@ -35,7 +35,7 @@ class ProductSkuId(
     }
 }
 
-@JsonClass(generateAdapter = true)
+@Serializable
 data class CollectionItem(
     val status: String,
     val acquiredDate: String,
@@ -44,7 +44,7 @@ data class CollectionItem(
     val endDate: String,
     val startDate: String,
     val modifiedDate: String,
-    val purchasedCountry: String?,
-    val isTrial: Boolean?,
-    val trialTimeRemaining: String?
+    val purchasedCountry: String? = null,
+    val isTrial: Boolean? = null,
+    val trialTimeRemaining: String? = null
 )

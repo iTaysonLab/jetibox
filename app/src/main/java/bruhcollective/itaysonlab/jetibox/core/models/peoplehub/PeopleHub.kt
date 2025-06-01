@@ -1,8 +1,8 @@
 package bruhcollective.itaysonlab.jetibox.core.models.peoplehub
 
-import com.squareup.moshi.JsonClass
+import kotlinx.serialization.Serializable
 
-@JsonClass(generateAdapter = true)
+@Serializable
 class PeopleHubResponse(
-    val people: List<XblPerson>
+    val people: List<XblPerson> = emptyList()
 )

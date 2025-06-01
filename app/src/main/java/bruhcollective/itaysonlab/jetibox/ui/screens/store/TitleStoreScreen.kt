@@ -213,6 +213,7 @@ class TitleStoreScreenViewModel @Inject constructor(
                 contentWarning = TitleContentWarning(app.titles.first().contentBoards ?: emptyList())
             )
         } catch (e: Exception) {
+            e.printStackTrace()
             StoreData.Error(e)
         }
     }

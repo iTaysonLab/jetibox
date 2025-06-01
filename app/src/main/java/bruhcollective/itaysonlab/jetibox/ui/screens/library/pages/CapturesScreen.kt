@@ -1,7 +1,13 @@
 package bruhcollective.itaysonlab.jetibox.ui.screens.library.pages
 
 import androidx.compose.foundation.clickable
-import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.PaddingValues
+import androidx.compose.foundation.layout.aspectRatio
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.grid.GridCells
 import androidx.compose.foundation.lazy.grid.GridItemSpan
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
@@ -12,7 +18,10 @@ import androidx.compose.material.icons.filled.Image
 import androidx.compose.material.icons.filled.SelectAll
 import androidx.compose.material.icons.filled.Videocam
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.runtime.*
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.painter.ColorPainter
@@ -22,7 +31,11 @@ import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import bruhcollective.itaysonlab.jetibox.core.models.mediahub.*
+import bruhcollective.itaysonlab.jetibox.core.models.mediahub.ContentLocator
+import bruhcollective.itaysonlab.jetibox.core.models.mediahub.Gameclip
+import bruhcollective.itaysonlab.jetibox.core.models.mediahub.MediaHubEntry
+import bruhcollective.itaysonlab.jetibox.core.models.mediahub.MediaHubQuery
+import bruhcollective.itaysonlab.jetibox.core.models.mediahub.Screenshot
 import bruhcollective.itaysonlab.jetibox.core.models.titlehub.Title
 import bruhcollective.itaysonlab.jetibox.core.service.MediaHubService
 import bruhcollective.itaysonlab.jetibox.core.util.TimeUtils
@@ -36,9 +49,9 @@ import bruhcollective.itaysonlab.jetibox.ui.shared.components.CompositeSwitch
 import coil.compose.AsyncImage
 import com.google.accompanist.swiperefresh.SwipeRefresh
 import com.google.accompanist.swiperefresh.rememberSwipeRefreshState
-import com.squareup.moshi.Moshi
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.launch
+import kotlinx.serialization.json.Json
 import okio.ByteString.Companion.encodeUtf8
 import javax.inject.Inject
 
@@ -78,7 +91,7 @@ fun CapturesScreen(
 
 @HiltViewModel
 class CapturesViewModel @Inject constructor(
-    private val moshi: Moshi,
+    private val json: Json,
     private val mediaHubService: MediaHubService,
     private val xblUserController: XblUserController,
     private val xblTitleDatabase: XblTitleDatabase
@@ -145,8 +158,8 @@ class CapturesViewModel @Inject constructor(
 
     fun navigateToDetails(navigationWrapper: NavigationWrapper, item: MediaHubEntry) {
         when (item) {
-            is Gameclip -> navigationWrapper.navigate("capture/gameclip/${moshi.adapter(Gameclip::class.java).toJson(item).encodeUtf8().base64Url()}")
-            is Screenshot -> navigationWrapper.navigate("capture/screenshot/${moshi.adapter(Screenshot::class.java).toJson(item).encodeUtf8().base64Url()}")
+            is Gameclip -> navigationWrapper.navigate("capture/gameclip/${json.encodeToString<Gameclip>(item).encodeUtf8().base64Url()}")
+            is Screenshot -> navigationWrapper.navigate("capture/screenshot/${json.encodeToString<Screenshot>(item).encodeUtf8().base64Url()}")
             else -> error("Not supported!")
         }
     }

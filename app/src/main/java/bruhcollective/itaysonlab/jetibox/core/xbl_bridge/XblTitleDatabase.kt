@@ -5,25 +5,22 @@ import bruhcollective.itaysonlab.jetibox.core.ext.debugLog
 import bruhcollective.itaysonlab.jetibox.core.models.titlehub.StoreBatchRequest
 import bruhcollective.itaysonlab.jetibox.core.models.titlehub.Title
 import bruhcollective.itaysonlab.jetibox.core.service.TitleHubService
-import com.squareup.moshi.Moshi
-import com.squareup.moshi.adapter
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.withContext
+import kotlinx.serialization.json.Json
 import javax.inject.Inject
 import javax.inject.Singleton
 
 @Singleton
 class XblTitleDatabase @Inject constructor(
     private val database: ConfigService,
-    private val moshi: Moshi,
+    private val json: Json,
     private val service: TitleHubService
 ) {
     companion object {
         private const val TAG = "XblTitleDatabase"
     }
-
-    @OptIn(ExperimentalStdlibApi::class) private val titleAdapter by lazy { moshi.adapter<Title>() }
 
     suspend fun getTitles(titles: List<Long>) = withContext(Dispatchers.IO) {
         val sepTitles = titles.partition { id -> database.has("titles.$id") }
@@ -31,8 +28,8 @@ class XblTitleDatabase @Inject constructor(
         debugLog(TAG, "[getTitles] local: ${sepTitles.first.size}, network: ${sepTitles.second.size}")
 
         val localFetched = sepTitles.first
-            .mapNotNull { id ->
-                titleAdapter.fromJson(database.string("titles.$id", ""))
+            .map { id ->
+                json.decodeFromString<Title>(database.string("titles.$id", ""))
             }
 
         if (sepTitles.second.isEmpty()) {
@@ -51,7 +48,7 @@ class XblTitleDatabase @Inject constructor(
                     ).titles
                 }
             }.onEach { title ->
-                database.put("titles.${title.titleId}", titleAdapter.toJson(title))
+                database.put("titles.${title.titleId}", json.encodeToString<Title>(title))
             }
 
         return@withContext (localFetched + networkFetched).associateBy { it.modernTitleId }

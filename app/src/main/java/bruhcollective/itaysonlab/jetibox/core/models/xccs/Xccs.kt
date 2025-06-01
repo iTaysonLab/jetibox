@@ -1,29 +1,30 @@
 package bruhcollective.itaysonlab.jetibox.core.models.xccs
 
-import com.squareup.moshi.JsonClass
-import dev.zacsweers.moshix.sealed.annotations.TypeLabel
+import androidx.annotation.Keep
+import kotlinx.serialization.SerialName
+import kotlinx.serialization.Serializable
 
-@JsonClass(generateAdapter = true)
-class XccsResponse <T> (
+@Serializable
+class XccsResponse <T: XccsResponseModel> (
     val status: XccsStatus,
-    val result: List<T>
+    val result: List<T> = emptyList()
 )
 
-@JsonClass(generateAdapter = true)
+@Serializable
 class XccsStatus (
     val errorCode: String,
-    val errorMessage: String?,
+    val errorMessage: String? = null,
 )
 
 //
 
-@JsonClass(generateAdapter = true)
+@Serializable
 class DeviceAndPackages(
     val device: Device,
-    val packages: List<InstalledApp>
-)
+    val packages: List<InstalledApp> = emptyList()
+): XccsResponseModel
 
-@JsonClass(generateAdapter = true)
+@Serializable
 data class Device(
     val id: String,
     val name: String,
@@ -36,10 +37,10 @@ data class Device(
     val consoleStreamingEnabled: Boolean,
     val wirelessWarning: Boolean,
     val outOfHomeWarning: Boolean,
-    val storageDevices: List<StorageDevice>
-)
+    val storageDevices: List<StorageDevice> = emptyList()
+): XccsResponseModel
 
-@JsonClass(generateAdapter = true)
+@Serializable
 data class StorageDevice(
     val storageDeviceId: String,
     val storageDeviceName: String,
@@ -49,10 +50,12 @@ data class StorageDevice(
     val isGen9Compatible: Boolean?
 )
 
+@Serializable
 enum class DevicePowerState {
     ConnectedStandby, On, Off
 }
 
+@Serializable
 enum class ConsoleType(
     val productName: String
 ) {
@@ -66,11 +69,11 @@ enum class ConsoleType(
 
 //
 
-@JsonClass(generateAdapter = true)
+@Serializable
 data class InstalledApp(
-    val oneStoreProductId: String?,
+    val oneStoreProductId: String? = null,
     val titleId: Long,
-    val aumid: String?,
+    val aumid: String? = null,
     val isGame: Boolean,
     val name: String,
     val contentType: String,
@@ -80,32 +83,32 @@ data class InstalledApp(
     val version: Long,
     val sizeInBytes: Long,
     val installTime: String,
-    val updateTime: String?,
-    val lastActiveTime: String?,
-    val parentId: String?,
-    val legacyProductId: String?
-)
+    val updateTime: String? = null,
+    val lastActiveTime: String? = null,
+    val parentId: String? = null,
+    val legacyProductId: String? = null
+): XccsResponseModel
 
 //
 
-@JsonClass(generateAdapter = true)
+@Serializable
 data class XccsOperation(
     val destination: String, // Xbox
     val type: String, // Shell
     val command: String, // UninstallPackage / InstallPackages
     val sessionId: String, // maybe UUID generation?
     val sourceId: String, // com.microsoft.xboxone.smartglass
-    val parameters: List<Map<String, String>>, // first: instanceId with installedApp.instanceId (or bigCatIdList if installing), second: installEvents with true
+    val parameters: List<Map<String, String>> = emptyList(), // first: instanceId with installedApp.instanceId (or bigCatIdList if installing), second: installEvents with true
     val linkedXboxId: String // logic
 )
 
-@JsonClass(generateAdapter = true)
+@Serializable
 class XccsSendOperationResponse (
     val status: XccsStatus,
     val opId: String
 )
 
-@JsonClass(generateAdapter = true)
+@Serializable
 class XccsOperationQuery(
     val status: XccsStatus,
     val operationStatus: String,
@@ -116,16 +119,16 @@ class XccsOperationQuery(
 
 //
 
-@JsonClass(generateAdapter = true)
+@Serializable
 class XccsInstallEventsResponse (
     val status: XccsStatus,
-    val result: List<InstallEvent>
+    val result: List<InstallEvent> = emptyList()
 )
 
-@JsonClass(generateAdapter = true, generator = "sealed:eventType")
+@Serializable
 sealed class InstallEvent {
-    @TypeLabel("InstallStarted")
-    @JsonClass(generateAdapter = true)
+    @SerialName("InstallStarted")
+    @Serializable
     class InstallStarted(
         val eventTime: String,
         val oneStoreProductId: String,
@@ -139,8 +142,8 @@ sealed class InstallEvent {
         val transferState: String
     ): InstallEvent()
 
-    @TypeLabel("UninstallCompleted")
-    @JsonClass(generateAdapter = true)
+    @SerialName("UninstallCompleted")
+    @Serializable
     class UninstallCompleted(
         val eventTime: String,
         val oneStoreProductId: String,
@@ -149,3 +152,7 @@ sealed class InstallEvent {
         val productName: String,
     ): InstallEvent()
 }
+
+@Serializable
+@Keep
+sealed interface XccsResponseModel

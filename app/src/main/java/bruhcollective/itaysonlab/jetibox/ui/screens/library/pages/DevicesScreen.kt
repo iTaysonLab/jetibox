@@ -3,11 +3,28 @@ package bruhcollective.itaysonlab.jetibox.ui.screens.library.pages
 import android.text.format.Formatter
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
-import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.PaddingValues
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
-import androidx.compose.material3.*
-import androidx.compose.runtime.*
+import androidx.compose.material3.Card
+import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.LinearProgressIndicator
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Text
+import androidx.compose.material3.surfaceColorAtElevation
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -20,16 +37,15 @@ import androidx.lifecycle.viewModelScope
 import bruhcollective.itaysonlab.jetibox.R
 import bruhcollective.itaysonlab.jetibox.core.models.xccs.Device
 import bruhcollective.itaysonlab.jetibox.core.models.xccs.DevicePowerState
-import bruhcollective.itaysonlab.jetibox.core.service.XccsService
 import bruhcollective.itaysonlab.jetibox.core.xbl_bridge.XccsController
 import bruhcollective.itaysonlab.jetibox.ui.navigation.LocalNavigationWrapper
 import bruhcollective.itaysonlab.jetibox.ui.shared.FullScreenError
 import bruhcollective.itaysonlab.jetibox.ui.shared.FullScreenLoading
 import com.google.accompanist.swiperefresh.SwipeRefresh
 import com.google.accompanist.swiperefresh.rememberSwipeRefreshState
-import com.squareup.moshi.Moshi
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.launch
+import kotlinx.serialization.json.Json
 import okio.ByteString.Companion.encodeUtf8
 import javax.inject.Inject
 
@@ -61,7 +77,7 @@ fun DevicesScreen(
 
 @HiltViewModel
 class DevicesViewModel @Inject constructor(
-    private val moshi: Moshi,
+    private val json: Json,
     private val xccsController: XccsController
 ) : ViewModel() {
     var state by mutableStateOf<State>(State.Loading)
@@ -92,7 +108,7 @@ class DevicesViewModel @Inject constructor(
         }
     }
 
-    fun generateUrl(device: Device) = moshi.adapter(Device::class.java).toJson(device).encodeUtf8().base64Url()
+    fun generateUrl(device: Device) = json.encodeToString(device).encodeUtf8().base64Url()
 
     sealed class State {
         class Ready(val devices: List<Device>) : State()

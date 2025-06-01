@@ -1,9 +1,9 @@
 package bruhcollective.itaysonlab.jetibox.core.models.peoplehub
 
-import com.squareup.moshi.Json
-import com.squareup.moshi.JsonClass
+import kotlinx.serialization.SerialName
+import kotlinx.serialization.Serializable
 
-@JsonClass(generateAdapter = true)
+@Serializable
 data class XblPerson(
     val xuid: String,
     val displayName: String,
@@ -19,20 +19,20 @@ data class XblPerson(
     val presenceText: String,
     val isXbox360Gamerpic: Boolean,
     val preferredColor: XblPersonPreferredColor,
-    val presenceDetails: List<XblPersonPresenceDetail>,
+    val presenceDetails: List<XblPersonPresenceDetail> = emptyList(),
     val colorTheme: String,
-    val linkedAccounts: List<XblPersonLinkedAccount>,
+    val linkedAccounts: List<XblPersonLinkedAccount> = emptyList(),
     val detail: XblPersonDetail
 )
 
-@JsonClass(generateAdapter = true)
+@Serializable
 data class XblPersonPreferredColor(
     val primaryColor: String,
     val secondaryColor: String,
     val tertiaryColor: String,
 )
 
-@JsonClass(generateAdapter = true)
+@Serializable
 data class XblPersonLinkedAccount(
     val networkName: String,
     val displayName: String,
@@ -41,7 +41,7 @@ data class XblPersonLinkedAccount(
     val isFamilyFriendly: Boolean,
 )
 
-@JsonClass(generateAdapter = true)
+@Serializable
 data class XblPersonDetail(
     val accountTier: String,
     val bio: String,
@@ -55,13 +55,13 @@ data class XblPersonDetail(
     @Transient val isGold = accountTier == "Gold"
 }
 
-@JsonClass(generateAdapter = true)
+@Serializable
 data class XblPersonPresenceDetail(
-    @Json(name = "Device") val device: String,
-    @Json(name = "DeviceSubType") val deviceSubType: String?,
-    @Json(name = "PresenceText") val presenceText: String,
-    @Json(name = "State") val state: String,
-    @Json(name = "TitleId") val titleId: String,
-    @Json(name = "IsGame") val isGame: Boolean,
-    @Json(name = "IsPrimary") val isPrimary: Boolean,
+    @SerialName(value = "Device") val device: String,
+    @SerialName(value = "DeviceSubType") val deviceSubType: String? = null,
+    @SerialName(value = "PresenceText") val presenceText: String,
+    @SerialName(value = "State") val state: String,
+    @SerialName(value = "TitleId") val titleId: String,
+    @SerialName(value = "IsGame") val isGame: Boolean,
+    @SerialName(value = "IsPrimary") val isPrimary: Boolean,
 )

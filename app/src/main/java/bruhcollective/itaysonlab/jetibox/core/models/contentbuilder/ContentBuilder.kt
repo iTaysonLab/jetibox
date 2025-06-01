@@ -1,16 +1,19 @@
 package bruhcollective.itaysonlab.jetibox.core.models.contentbuilder
 
-import com.squareup.moshi.JsonClass
-import dev.zacsweers.moshix.sealed.annotations.DefaultObject
-import dev.zacsweers.moshix.sealed.annotations.TypeLabel
+import kotlinx.serialization.ExperimentalSerializationApi
+import kotlinx.serialization.SerialName
+import kotlinx.serialization.Serializable
+import kotlinx.serialization.json.JsonClassDiscriminator
+import kotlinx.serialization.modules.SerializersModule
+import kotlinx.serialization.modules.polymorphic
 
-@JsonClass(generateAdapter = true)
+@Serializable
 class ContentBuilderResponse(
     val v: Int,
-    val layout: List<ContentBuilderLayoutItem>
+    val layout: List<ContentBuilderLayoutItem> = emptyList()
 )
 
-@JsonClass(generateAdapter = true)
+@Serializable
 class ContentBuilderLayoutItem(
     val channelType: String,
     val channelId: String,
@@ -20,67 +23,77 @@ class ContentBuilderLayoutItem(
     val channelData: ContentBuilderLayoutItemData? = null
 )
 
-@JsonClass(generateAdapter = true)
+@Serializable
 class ContentBuilderLayoutItemData(
-    val items: List<ContentBuilderDataItem>
+    val items: List<ContentBuilderDataItem> = emptyList()
 )
 
-@JsonClass(generateAdapter = true)
+@Serializable
 class ContentBuilderDataItem(
     val itemId: String,
-    val itemLayers: List<ContentBuilderLayer>
+    val itemLayers: List<ContentBuilderLayer> = emptyList()
 )
 
-@JsonClass(generateAdapter = true)
+@Serializable
 class ContentBuilderDataLayer(
     val layer: String,
     val dataType: String,
     val data: ContentBuilderDataLayerEntry,
 )
 
-@JsonClass(generateAdapter = true)
+@Serializable
 class ContentBuilderDataLayerEntry(
     val totalCount: Int,
 )
 
 //
 
-@JsonClass(generateAdapter = true, generator = "sealed:dataType")
+@OptIn(ExperimentalSerializationApi::class)
+@Serializable
+@JsonClassDiscriminator("dataType")
 sealed class ContentBuilderLayer {
+    companion object {
+        val serializerModule = SerializersModule {
+            polymorphic(ContentBuilderLayer::class) {
+                defaultDeserializer { Unknown.serializer() }
+            }
+        }
+    }
+
     abstract val layer: String
 
-    @TypeLabel("title")
-    @JsonClass(generateAdapter = true)
+    @SerialName("title")
+    @Serializable
     data class GameTitle(override val layer: String, val data: GameTitleLayerData) : ContentBuilderLayer()
 
-    @TypeLabel("label")
-    @JsonClass(generateAdapter = true)
+    @SerialName("label")
+    @Serializable
     data class Label(override val layer: String, val data: LabelLayerData) : ContentBuilderLayer()
 
-    @TypeLabel("editorial")
-    @JsonClass(generateAdapter = true)
+    @SerialName("editorial")
+    @Serializable
     data class Editorial(override val layer: String, val data: EditorialLayerData) : ContentBuilderLayer()
 
-    @DefaultObject
-    object Unknown : ContentBuilderLayer() {
+    @Serializable
+    data object Unknown : ContentBuilderLayer() {
         override val layer = ""
     }
 }
 
 //
 
-@JsonClass(generateAdapter = true)
+@Serializable
 class GameTitleLayerData(
     val totalCount: Int,
-    val titles: List<Long>
+    val titles: List<Long> = emptyList()
 )
 
-@JsonClass(generateAdapter = true)
+@Serializable
 class LabelLayerData(
     val label: String
 )
 
-@JsonClass(generateAdapter = true)
+@Serializable
 class EditorialLayerData(
     val label: String,
     val action: String,

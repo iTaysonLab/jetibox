@@ -1,8 +1,8 @@
 package bruhcollective.itaysonlab.jetibox.core.models.mediahub
 
-import com.squareup.moshi.JsonClass
+import kotlinx.serialization.Serializable
 
-@JsonClass(generateAdapter = true)
+@Serializable
 class MediaHubQuery(
     val query: String,
     val max: Int,

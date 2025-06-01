@@ -79,10 +79,10 @@ import bruhcollective.itaysonlab.jetibox.core.xbl_bridge.XblTitleDatabase
 import bruhcollective.itaysonlab.jetibox.ui.navigation.LocalNavigationWrapper
 import bruhcollective.itaysonlab.jetibox.ui.shared.FullScreenLoading
 import coil.compose.AsyncImage
-import com.squareup.moshi.Moshi
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
+import kotlinx.serialization.json.Json
 import okio.ByteString.Companion.decodeBase64
 import javax.inject.Inject
 
@@ -169,7 +169,7 @@ fun MediaEntryScreen(
 @HiltViewModel
 class MediaEntryViewModel @Inject constructor(
     private val xblTitleDatabase: XblTitleDatabase,
-    private val moshi: Moshi
+    private val json: Json
 ) : ViewModel() {
     var currentDialog by mutableStateOf<@Composable () -> Unit>({})
 
@@ -179,9 +179,13 @@ class MediaEntryViewModel @Inject constructor(
     suspend fun loadTitle(context: Context, json: String, isGameclip: Boolean) {
         if (state != State.Loading) return
 
-        val entry = moshi.adapter(
-            if (isGameclip) Gameclip::class.java else Screenshot::class.java
-        ).fromJson(json.decodeBase64()!!.string(Charsets.UTF_8))!!
+        val jsonDecoded = json.decodeBase64()!!.string(Charsets.UTF_8)
+
+        val entry = if (isGameclip) {
+            this.json.decodeFromString<Gameclip>(jsonDecoded)
+        } else {
+            this.json.decodeFromString<Screenshot>(jsonDecoded)
+        }
 
         val title = xblTitleDatabase.getTitles(listOf(entry.getGameId())).values.first()
 

@@ -1,15 +1,15 @@
 package bruhcollective.itaysonlab.jetibox.core.models.titlehub
 
-import com.squareup.moshi.Json
-import com.squareup.moshi.JsonClass
+import kotlinx.serialization.Serializable
+import kotlinx.serialization.SerialName
 
-@JsonClass(generateAdapter = true)
+@Serializable
 class TitleHubResponse(
-    val titles: List<Title>,
+    val titles: List<Title> = emptyList(),
     val xuid: String
 )
 
-@JsonClass(generateAdapter = true)
+@Serializable
 data class Title(
     val name: String,
     val mediaItemType: String,
@@ -17,30 +17,30 @@ data class Title(
     val modernTitleId: Long,
     val titleId: Long,
     val displayImage: String,
-    val devices: List<String>,
+    val devices: List<String> = emptyList(),
     val gamePass: TitleGamepassStatus,
-    val images: List<TitleImage>?,
-    val achievement: TitleAchievementInfo?,
-    val detail: TitleDetail?,
-    val contentBoards: List<TitleContentWarnings>?,
-    val pfn: String?,
-    val hardware: TitleHardwareInfo?,
-    val productId: String?,
-    val productIds: List<String>?
+    val images: List<TitleImage> = emptyList(),
+    val achievement: TitleAchievementInfo? = null,
+    val detail: TitleDetail? = null,
+    val contentBoards: List<TitleContentWarnings> = emptyList(),
+    val pfn: String? = null,
+    val hardware: TitleHardwareInfo? = null,
+    val productId: String? = null,
+    val productIds: List<String> = emptyList()
 )
 
-@JsonClass(generateAdapter = true)
+@Serializable
 class TitleGamepassStatus(
     val isGamePass: Boolean
 )
 
-@JsonClass(generateAdapter = true)
+@Serializable
 class TitleImage(
     val url: String,
     val type: String
 )
 
-@JsonClass(generateAdapter = true)
+@Serializable
 class TitleAchievementInfo(
     val currentAchievements: Int,
     val totalAchievements: Int,
@@ -50,12 +50,12 @@ class TitleAchievementInfo(
     val sourceVersion: Int,
 )
 
-@JsonClass(generateAdapter = true)
+@Serializable
 class TitleDetail(
-    val attributes: List<TitleAttribute>,
+    val attributes: List<TitleAttribute> = emptyList(),
     val description: String,
     val developerName: String,
-    val genres: List<String>,
+    val genres: List<String> = emptyList(),
     val minAge: Int,
     val publisherName: String,
     val releaseDate: String,
@@ -63,24 +63,24 @@ class TitleDetail(
     val xboxLiveGoldRequired: Boolean
 )
 
-@JsonClass(generateAdapter = true)
+@Serializable
 class TitleAttribute(
-    val applicablePlatforms: List<String>?,
+    val applicablePlatforms: List<String> = emptyList(),
     val name: String,
-    val minimum: String?,
-    val maximum: String?
+    val minimum: Int? = null,
+    val maximum: Int? = null
 )
 
-@JsonClass(generateAdapter = true)
+@Serializable
 class TitleHardwareInfo(
     val maxDownloadSizeInBytes: Long
 )
 
-@JsonClass(generateAdapter = true)
+@Serializable
 class TitleContentWarnings(
-    @Json(name = "InteractiveElements") val interactiveElements: List<String>,
-    @Json(name = "RatingDescriptors") val descriptors: List<String>,
-    @Json(name = "RatingDisclaimers") val disclaimers: List<String>,
-    @Json(name = "RatingSystem") val ratingSystem: String,
-    @Json(name = "RatingId") val ratingId: String,
+    @SerialName(value = "InteractiveElements") val interactiveElements: List<String> = emptyList(),
+    @SerialName(value = "RatingDescriptors") val descriptors: List<String> = emptyList(),
+    @SerialName(value = "RatingDisclaimers") val disclaimers: List<String> = emptyList(),
+    @SerialName(value = "RatingSystem") val ratingSystem: String,
+    @SerialName(value = "RatingId") val ratingId: String,
 )

@@ -5,12 +5,7 @@ plugins {
     id 'org.jetbrains.kotlin.plugin.compose'
     id 'org.jetbrains.kotlin.plugin.serialization'
     id 'com.google.devtools.ksp' version "$ksp_version"
-    id 'dev.zacsweers.moshix' version "$moshix_version"
     id 'dagger.hilt.android.plugin'
-}
-
-moshi {
-    enableSealed.set(true)
 }
 
 kapt {
@@ -70,6 +65,7 @@ dependencies {
 
     // Kotlin
     implementation "org.jetbrains.kotlinx:kotlinx-datetime:0.6.2"
+    implementation "org.jetbrains.kotlinx:kotlinx-serialization-json:1.8.1"
 
     // AndroidX
     implementation "androidx.core:core-ktx:1.16.0"
@@ -107,7 +103,7 @@ dependencies {
 
     // Network
     implementation "com.squareup.retrofit2:retrofit:$retrofit_version"
-    implementation "com.squareup.retrofit2:converter-moshi:$retrofit_version"
+    implementation "com.squareup.retrofit2:converter-kotlinx-serialization:$retrofit_version"
     implementation "io.coil-kt:coil:$coil_version"
     implementation "io.coil-kt:coil-compose:$coil_version"
 

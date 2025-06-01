@@ -1,21 +1,21 @@
 package bruhcollective.itaysonlab.jetibox.core.models.displaycatalog
 
-import com.squareup.moshi.Json
-import com.squareup.moshi.JsonClass
+import kotlinx.serialization.SerialName
+import kotlinx.serialization.Serializable
 
-@JsonClass(generateAdapter = true)
+@Serializable
 class ProductFamiliesData(
-    @Json(name = "DisplayData") val displayData: List<ProductFamilyGroup>
+    @SerialName(value = "DisplayData") val displayData: List<ProductFamilyGroup> = emptyList()
 )
 
-@JsonClass(generateAdapter = true)
+@Serializable
 class ProductFamilyGroup(
-    @Json(name = "Group") val group: String,
-    @Json(name = "LocalizedValues") val values: List<ProductFamilyGroupLocalizedValue>,
+    @SerialName(value = "Group") val group: String,
+    @SerialName(value = "LocalizedValues") val values: List<ProductFamilyGroupLocalizedValue> = emptyList(),
 )
 
-@JsonClass(generateAdapter = true)
+@Serializable
 class ProductFamilyGroupLocalizedValue(
-    @Json(name = "Value") val value: String,
-    @Json(name = "Localized") val localized: String
+    @SerialName(value = "Value") val value: String,
+    @SerialName(value = "Localized") val localized: String
 )

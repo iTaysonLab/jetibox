@@ -1,43 +1,43 @@
 package bruhcollective.itaysonlab.jetibox.core.models.achievements
 
-import com.squareup.moshi.JsonClass
+import kotlinx.serialization.Serializable
 
-@JsonClass(generateAdapter = true)
+@Serializable
 class AchievementsResponse(
-    val achievements: List<Achievement>,
+    val achievements: List<Achievement> = emptyList(),
     val pagingInfo: AchievementPagingInfo
 )
 
-@JsonClass(generateAdapter = true)
+@Serializable
 class AchievementPagingInfo(
     val totalRecords: Int,
-    val continuationToken: String?,
+    val continuationToken: String? = null,
 )
 
-@JsonClass(generateAdapter = true)
+@Serializable
 class Achievement(
     val name: String,
     val lockedDescription: String,
     val description: String,
     val isSecret: Boolean,
     val rarity: AchievementRarity,
-    val rewards: List<AchievementReward>,
-    val mediaAssets: List<AchievementMedia>,
+    val rewards: List<AchievementReward> = emptyList(),
+    val mediaAssets: List<AchievementMedia> = emptyList(),
 )
 
-@JsonClass(generateAdapter = true)
+@Serializable
 class AchievementRarity(
     val currentPercentage: Float,
     val currentCategory: String
 )
 
-@JsonClass(generateAdapter = true)
+@Serializable
 class AchievementReward(
     val value: Int,
     val type: String
 )
 
-@JsonClass(generateAdapter = true)
+@Serializable
 class AchievementMedia(
     val name: String,
     val type: String,
